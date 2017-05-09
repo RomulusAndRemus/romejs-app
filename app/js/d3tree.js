@@ -1,3 +1,9 @@
+let rightClickRouteID = null;
+let rightClickXnY = null;
+//when rightclick add route, this = ID
+
+let contextMenuShowing = false;
+
 let masterData =
   {
     "name": "App", "children": [{
@@ -64,7 +70,7 @@ let masterData =
     }]
   }
 
-masterData = data;
+// if (data) masterData = data;
 
 //replace with the data you get from Steve
 const routeLinks = {
@@ -83,8 +89,8 @@ let interCount = 0;
 
 
 const margin = { top: 0, right: 20, bottom: 20, left: 80 },
-  width = 1200 - margin.right - margin.left,
-  height = 620 - margin.top - margin.bottom;
+  width = 1600 - margin.right - margin.left,
+  height = 420 - margin.top - margin.bottom;
 
 let i = 0,
   duration = 750,
@@ -162,6 +168,14 @@ function expandLinks(linkData) {
   });
 }
 
+
+function rightClickMenu(){
+  let originX = coordinates[d3.select(this).text()].place[1]
+  let originY = coordinates[d3.select(this).text()].place[0]
+
+  console.log(originX)  
+}
+
 function update(source) {
   // Compute the new tree layout.
   let nodes = tree.nodes(root).reverse(),
@@ -189,8 +203,10 @@ function update(source) {
   nodeEnter.append("circle")
     .attr("r", 1e-6)
     .style("fill", d => d._children ? "#42f4aa" : "#000000")
-    .on("mouseout", d => d._children ? d3.select(this).style("fill", "#42f4aa") : d3.select(this).style("fill", "black"))
-    .on("mouseover", function () { d3.select(this).style("fill", "white"); });
+    .on("mouseout", function (d) { d._children ? d3.select(this).style("fill", "#42f4aa") : d3.select(this).style("fill", "black")})
+    .on("mouseover", function () { d3.select(this).style("fill", "white"); })
+    .on("contextmenu", rightClickMenu);
+
 
 
   nodeEnter.append("text")
@@ -283,3 +299,55 @@ function click(d) {
   }
   update(d);
 }
+
+
+
+contextMenuShowing = false;
+
+d3.select("body").on('contextmenu',function (d,i) {
+    if(contextMenuShowing) {
+        d3.event.preventDefault();
+        d3.select(".popup").remove();
+        contextMenuShowing = false;
+    } else {
+        d3_target = d3.select(d3.event.target);
+        if (d3_target.classed("node")) {
+            d3.event.preventDefault();
+            contextMenuShowing = true;
+            d = d3_target.datum();
+            // Build the popup
+            
+            canvas = d3.select('canvas');
+            mousePosition = d3.mouse(canvas.node());
+            
+            popup = canvas.append("div")
+                .attr("class", "popup")
+                .style("left", mousePosition[0] + "px")
+                .style("top", mousePosition[1] + "px");
+            popup.append("h2").text(d.display_division);
+            popup.append("p").text(
+                "Fun.")
+            popup.append("p"); 
+            
+            canvasSize = [
+                canvas.node().offsetWidth,
+                canvas.node().offsetHeight
+            ];
+            
+            popupSize = [ 
+                popup.node().offsetWidth,
+                popup.node().offsetHeight
+            ];
+            
+            if (popupSize[0] + mousePosition[0] > canvasSize[0]) {
+                popup.style("left","auto");
+                popup.style("right",0);
+            }
+            
+            if (popupSize[1] + mousePosition[1] > canvasSize[1]) {
+                popup.style("top","auto");
+                popup.style("bottom",0);
+            }
+        }
+    }
+});
