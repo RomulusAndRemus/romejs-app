@@ -1,17 +1,16 @@
-let rightClickRouteID = null;
-let rightClickXnY = null;
-//when rightclick add route, this = ID
-
-let contextMenuShowing = false;
+$(function () {
+  $('[data-toggle="popover"]').popover()
+})
 
 let masterData =
   {
-    "name": "App", "children": [{
+    "name": "App", "render": true, "children": [{
       'name': 'Container',
       'children': [
         { 'name': 'Aebutius', 'size': 3000 },
         {
           'name': 'Aelius',
+          "render": true,
           'children': [
             { 'name': 'Atius', 'size': 3000, "links": ["Ship", "Compo3"] },
             { 'name': 'Aurelius' }
@@ -70,7 +69,8 @@ let masterData =
     }]
   }
 
-// if (data) masterData = data;
+if (data) masterData[0] = data;
+
 
 //replace with the data you get from Steve
 const routeLinks = {
@@ -102,7 +102,7 @@ let tree = d3.layout.tree()
 let diagonal = d3.svg.diagonal()
   .projection(d => [d.y, d.x]);
 
-let svg = d3.select("body").append("svg")
+let svg = d3.select(".canvas").append("svg")
   .attr("width", width + margin.right + margin.left)
   .attr("height", height + margin.top + margin.bottom)
   .append("g")
@@ -160,7 +160,7 @@ function expandLinks(linkData) {
     if (originate === link) {
       routeLinks[link].forEach(el => {
         if (coordinates[el]) {
-          let thisId = "#" + routeLinks[originate][l];
+          let thisId = "#" + el;
           d3.select(thisId + " circle").transition().duration(1200).style("fill", "black");
         }
       })
@@ -168,12 +168,15 @@ function expandLinks(linkData) {
   });
 }
 
-
-function rightClickMenu(){
-  let originX = coordinates[d3.select(this).text()].place[1]
-  let originY = coordinates[d3.select(this).text()].place[0]
-
-  console.log(originX)  
+function renderRed(d) {
+  // console.log(d)
+  if (!d.render) {
+    // console.log(d);
+    return d._children ? "#42f4aa" : "#000000"
+  } else {
+    // console.log(d, 'this should be red')
+    return "red"
+  }
 }
 
 function update(source) {
@@ -194,20 +197,11 @@ function update(source) {
     .attr("transform", d => "translate(" + source.y0 + "," + source.x0 + ")")
     .on("click", click);
 
-  // console.log(nodeEnter.append("circle")
-  //     .attr("r", 1e-6)
-  //     .style("fill", function(d) { return d._children ? "#42f4aa" : "#000000"; })
-  //     .on("mouseout", function(d){ return d._children ? d3.select(this).style("fill", "#42f4aa") : d3.select(this).style("fill", "black");})
-  //     .on("mouseover", function(){d3.select(this).style("fill", "white")}))
-
   nodeEnter.append("circle")
     .attr("r", 1e-6)
-    .style("fill", d => d._children ? "#42f4aa" : "#000000")
-    .on("mouseout", function (d) { d._children ? d3.select(this).style("fill", "#42f4aa") : d3.select(this).style("fill", "black")})
+    .style("fill", /* ****RENDER COLOR FUNCTIOOOOOOOOOOOOOOOOOOOOOOOON HERE*** */ '#42f4aa')
+    .on("mouseout", function (d) { d._children ? d3.select(this).style("fill", renderRed) : d3.select(this).style("fill", renderRed) })
     .on("mouseover", function () { d3.select(this).style("fill", "white"); })
-    .on("contextmenu", rightClickMenu);
-
-
 
   nodeEnter.append("text")
     .attr("x", d => d.children || d._children ? -10 : 10)
@@ -215,12 +209,33 @@ function update(source) {
     .attr("text-anchor", d => d.children || d._children ? "end" : "start")
     .text(d => d.name)
     .style("fill-opacity", 1e-6)
-    .on("mouseover", linkLines)
-    .on("mouseout", function () { expandLinks(); d3.select(this).style("fill", "white"); d3.select("line").remove() })
-
-
-
-
+    .attr("data-toggle", "popover")
+    .attr("data-placement", "top")
+    .attr("data-content", "Vivamus sagittis lacus vel augue laoreet rutrum faucibus.")
+    .on("click", function() {
+      console.log('click')
+      $(".text").popover();
+    })
+    .tooltip(function(d, i) {
+      console.log(d)
+      let svg1;
+      svg1 = d3.select(document.createElement("svg")).attr("height", 50);
+      g = svg1.append("g");
+      g.append("text").text("10 times the radius of the cirlce").attr("dy", "25");
+      return {
+        type: "popover",
+        title: "It's a me, Rectangle",
+        content: svg1,
+        detection: "shape",
+        placement: "fixed",
+        gravity: "bottom",
+        position: [d.x, d.y],
+        displacement: [-80, 30],
+        mousemove: false
+      };
+    })
+    // .on("mouseover", linkLines)
+    // .on("mouseout", function () { expandLinks(); d3.select(this).style("fill", "white"); d3.select("line").remove() });
 
   // Transition nodes to their new position.
   let nodeUpdate = node.transition()
@@ -233,13 +248,19 @@ function update(source) {
 
   nodeUpdate.select("circle")
     .attr("r", 8)
-    .style("fill", d => d._children ? "#42f4aa" : "black")
+    .style("fill", renderRed/*d => d._children ? "#42f4aa" : "black"*/)
 
   nodeUpdate.select("text")
     .style("fill-opacity", 1)
-    .style("fill", "white")
+    .attr("class", "text")
+    .style("fill", "white");
 
-  // Transition exiting nodes to the parent's new position.
+
+
+
+
+
+    // Transition exiting nodes to the parent's new position.
   let nodeExit = node.exit().transition()
     .duration(duration)
     .attr("transform", function (d) { for (let key in coordinates) { delete coordinates[d3.select(this).text().toString()] }; masterIdx = 0; return "translate(" + source.y + "," + source.x + ")"; })
@@ -260,29 +281,30 @@ function update(source) {
   // Enter any new links at the parent's previous position.
   link.enter().insert("path", "g")
     .attr("class", "link")
-    .attr("d", d => { let o = { x: source.x0, y: source.y0 }; return diagonal({ source: o, target: o });
-  })
-  
+    .attr("d", d => {
+      let o = { x: source.x0, y: source.y0 }; return diagonal({ source: o, target: o });
+    })
+
   // Transition links to their new position.
   repeat();
 
   function repeat() {
     link.transition()
-    .duration(duration)
-    .attr("d", diagonal)
-    .transition().duration(2400).style("stroke", "#42f4aa")
-    .transition().duration(2400).style("stroke", "#1b6346")
-    .each("end", repeat);
+      .duration(duration)
+      .attr("d", diagonal)
+      .transition().duration(2400).style("stroke", "#42f4aa")
+      .transition().duration(2400).style("stroke", "#1b6346")
+      .each("end", repeat);
   }
 
   // Transition exiting nodes to the parent's new position.
   link.exit().transition()
     .duration(duration)
-    .attr("d", d => { let o = { x: source.x, y: source.y }; return diagonal({ source: o, target: o })})
+    .attr("d", d => { let o = { x: source.x, y: source.y }; return diagonal({ source: o, target: o }) })
     .remove();
 
   // Stash the old positions for transition.
-  nodes.forEach( d => {
+  nodes.forEach(d => {
     d.x0 = d.x;
     d.y0 = d.y;
   });
@@ -300,54 +322,34 @@ function click(d) {
   update(d);
 }
 
+let contextMenuShowing = false;
 
+d3.select("body").on('contextmenu', function (d, i) {
+  if (contextMenuShowing) {
+    d3.event.preventDefault();
+    d3.select(".popup").remove();
+    contextMenuShowing = false;
+  } else {
+    d3_target = d3.select(d3.event.target);
+    if (d3_target.classed("text")) {
+      let originX = coordinates[d3_target.text()].place[1];
+      let originY = coordinates[d3_target.text()].place[0];
+      d3.event.preventDefault();
+      contextMenuShowing = true;
+      d = d3_target.datum();
+      // Build the popup
+      canvas = d3.select(".canvas");
+      mousePosition = d3.mouse(canvas.node());
 
-contextMenuShowing = false;
-
-d3.select("body").on('contextmenu',function (d,i) {
-    if(contextMenuShowing) {
-        d3.event.preventDefault();
-        d3.select(".popup").remove();
-        contextMenuShowing = false;
-    } else {
-        d3_target = d3.select(d3.event.target);
-        if (d3_target.classed("node")) {
-            d3.event.preventDefault();
-            contextMenuShowing = true;
-            d = d3_target.datum();
-            // Build the popup
-            
-            canvas = d3.select('canvas');
-            mousePosition = d3.mouse(canvas.node());
-            
-            popup = canvas.append("div")
-                .attr("class", "popup")
-                .style("left", mousePosition[0] + "px")
-                .style("top", mousePosition[1] + "px");
-            popup.append("h2").text(d.display_division);
-            popup.append("p").text(
-                "Fun.")
-            popup.append("p"); 
-            
-            canvasSize = [
-                canvas.node().offsetWidth,
-                canvas.node().offsetHeight
-            ];
-            
-            popupSize = [ 
-                popup.node().offsetWidth,
-                popup.node().offsetHeight
-            ];
-            
-            if (popupSize[0] + mousePosition[0] > canvasSize[0]) {
-                popup.style("left","auto");
-                popup.style("right",0);
-            }
-            
-            if (popupSize[1] + mousePosition[1] > canvasSize[1]) {
-                popup.style("top","auto");
-                popup.style("bottom",0);
-            }
-        }
+      popup = canvas.append("div")
+      .attr("class", "popup")
+      .style("left", originX - 20 + 'px')
+      .style("top", originY - 40 + 'px');
+      popup.append("p").text("Add a Route")
+      popup.append("p")
+        .append("a")
+        .attr("href", d.link)
+        .text('YAASSSSS');
     }
+  }
 });

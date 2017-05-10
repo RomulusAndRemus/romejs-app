@@ -1,6 +1,5 @@
-import React  from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
-import path from 'path';
 import Nav from './Nav';
 import Home from './Home';
 import Dashboard from './Dashboard';
