@@ -12400,7 +12400,6 @@ module.exports = __webpack_require__(153);
     }
     outputData.push(mainObj);
     outputData.push(filepaths);
-    console.log(outputData);
     return outputData;
   }
   exports.ASTParser = ASTParser;
