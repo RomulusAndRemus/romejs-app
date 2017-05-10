@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, NavLink, Redirect} from 'react-router-dom';
-import { connect } from 'react-redux';
-import * as graphActions from '../actions/graphActions';
 import { dialog, remote } from  'electron';
 import componentParser from './../../componentParser/componentParser.js';
 import path from 'path';
@@ -16,7 +14,6 @@ class Home extends Component {
     let componentData;
     remote.dialog.showOpenDialog({ properties: [ 'openFile'], filters: [{ name: 'JavaScript', extensions: ['js', 'jsx'] }]}, (file) => {
       componentData = componentParser.ASTParser(file[0]);
-      this.props.createGraph(componentData);
       fs.writeFileSync('app/js/graph.js', 'const data = ' + JSON.stringify(componentData, null, 2));
       this.props.history.push('/graph');
     });
@@ -56,16 +53,4 @@ class Home extends Component {
   }
 }
 
-const mapStateToProps = (state, ownProps) => {
-  return {
-    components: state.components
-  }
-};
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    createGraph: (data) => dispatch(graphActions.createGraph(data))
-  }
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(Home);
+export default Home;

@@ -1,15 +1,22 @@
 (function () {
-  console.log('INSIDE COMPONENT PARSER')
   const fs = require('fs');
-  const esprima = require('esprima');
+  const eau = require('./esprima-ast-utils/index.js');
   const esquery = require('./esquery/esquery.js');
   const path = require('path');
 
   function ASTParser(file) {
-    let mainObj = {};
-    parse(file);
+
+    //This array contains the data for the component tree and the filepaths for each component
+    const outputData = [];
+
+    //Grabs the import variables and stores the variable name as the key and the path as the value
+    const filepaths = {};
+
+    //Parses through the React app and extracts the components
+    const mainObj = parse(file);
     function parse (entry){
-      const innerObj = {};
+
+      //Temporary object that we build and then 
       const inner = {};
 
       if(!fs.existsSync(entry)) {
@@ -28,10 +35,7 @@
       filename = filename.slice(0, -3);
       inner.name = filename;
 
-      let ast = esprima.parse(src, {
-        sourceType: 'module',
-        jsx: true
-      });
+      let ast = eau.parse(src);
 
       let imports = esquery(ast, "ImportDeclaration");
       let importVars = {};
@@ -42,7 +46,7 @@
             importVars[name] = ast.body[i].source.value
         }
       }
-      
+
       const reactComponents = [];
       let components = esquery(ast, "JSXOpeningElement");
 
@@ -56,7 +60,7 @@
 
       let identifiers = esquery(ast, "JSXIdentifier");
       for (let i = 0; i < identifiers.length; i += 1) {
-        if (importVars.hasOwnProperty(identifiers[i].name) && identifiers[i].name !== "Router") {
+        if (importVars.hasOwnProperty(identifiers[i].name) && identifiers[i].name !== "Router" && identifiers[i].name !== "path") {
           reactComponents.push(identifiers[i].name);
         }
       }
@@ -64,22 +68,26 @@
       if (reactComponents.length > 0){
         inner.children = [];
         reactComponents.forEach(e => {
-          if (importVars[e].includes('/')) {
-            let dir = importVars[e].split('/');
-            let name = dir.pop();
-            if (dir[0] === '.') dir.shift();
-            dir = dir.join('/');
-            dir = file + '/' + dir;
-            let filePath = '/' + dir + '/' + name;
-            filePath = filePath.replace(/\/+/g, '\/');
-            inner.children.push(parse(filePath));
+          if (importVars.hasOwnProperty(e)) {
+            if (importVars[e].includes('/')) {
+              let dir = importVars[e].split('/');
+              let name = dir.pop();
+              if (dir[0] === '.') dir.shift();
+              dir = dir.join('/');
+              dir = file + '/' + dir;
+              let filePath = '/' + dir + '/' + name;
+              filePath = filePath.replace(/\/+/g, '\/');
+              filepaths[filename] = filePath;
+              inner.children.push(parse(filePath));
+            }
           }
         });
       }
-      mainObj = inner;
       return inner;
     }
-    return mainObj;
+    outputData.push(mainObj);
+    outputData.push(filepaths);
+    return outputData;
   }
   exports.ASTParser = ASTParser;
 })();

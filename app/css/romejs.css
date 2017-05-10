@@ -279,3 +279,17 @@ ul.alert-dropdown {
   src: local('Orbitron-Light'), local('Orbitron-Regular'), url(../fonts/Orbitron.woff2) format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
 }
+
+
+.popup {
+    position: absolute;
+    left: 0;
+    top: 0;
+    background-color: #fff;
+    width: 100px;
+    border: 1px #ccc solid;
+    border-radius: 3px;
+    box-shadow: #333 2px 2px 4px;
+    padding: 8px;
+    font-family: arial, helvetica, sans-serif;
+}
