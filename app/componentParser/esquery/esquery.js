@@ -267,7 +267,7 @@
               }
             } else {
               +
-              results.push(node);
+                results.push(node);
             }
           }
         },
