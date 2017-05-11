@@ -12344,37 +12344,43 @@ module.exports = __webpack_require__(153);
       var filename = file.pop();
       file = file.join('/');
       filename = filename.slice(0, -3);
-      inner.name = filename;
 
       var ast = eau.parse(src);
 
-      var imports = esquery(ast, "ImportDeclaration");
       var importVars = {};
 
-      for (var i = 0; ast.body[i].type === "ImportDeclaration"; i++) {
-        if (ast.body[i].specifiers.length > 0) {
-          var name = ast.body[i].specifiers[0].local.name;
-          importVars[name] = ast.body[i].source.value;
-        }
-      }
-
-      var reactComponents = [];
-      var components = esquery(ast, "JSXOpeningElement");
-
-      for (var _i = 0; _i < components.length; _i++) {
-        for (var j = 0; j < components[_i].attributes.length; j++) {
-          if (components[_i].attributes[j].name.name === "component") {
-            reactComponents.push(components[_i].attributes[j].value.expression.name);
+      ast.body.forEach(function (elem) {
+        if (elem.type === 'ImportDeclaration') {
+          if (elem.specifiers.length > 0) {
+            var name = elem.specifiers[0].local.name;
+            importVars[name] = elem.source.value;
           }
         }
-      }
-
-      var identifiers = esquery(ast, "JSXIdentifier");
-      for (var _i2 = 0; _i2 < identifiers.length; _i2 += 1) {
-        if (importVars.hasOwnProperty(identifiers[_i2].name) && identifiers[_i2].name !== "Router" && identifiers[_i2].name !== "path") {
-          reactComponents.push(identifiers[_i2].name);
+        if (elem.type === 'ExportDefaultDeclaration') {
+          inner.name = elem.declaration.name;
         }
-      }
+      });
+
+      if (!inner.name) inner.name = filename;
+
+      var reactComponents = [];
+      var components = esquery(ast, 'JSXOpeningElement');
+
+      components.forEach(function (component) {
+        component.attributes.forEach(function (comp) {
+          if (comp.name.name === 'component') {
+            reactComponents.push(comp.value.expression.name);
+          }
+        });
+      });
+
+      var identifiers = esquery(ast, 'JSXIdentifier');
+
+      identifiers.forEach(function (identifier) {
+        if (importVars.hasOwnProperty(identifier.name) && identifier.name !== 'Router' && identifier.name !== 'path') {
+          reactComponents.push(identifier.name);
+        }
+      });
 
       if (reactComponents.length > 0) {
         inner.children = [];
@@ -12382,13 +12388,13 @@ module.exports = __webpack_require__(153);
           if (importVars.hasOwnProperty(e)) {
             if (importVars[e].includes('/')) {
               var dir = importVars[e].split('/');
-              var _name = dir.pop();
+              var name = dir.pop();
               if (dir[0] === '.') dir.shift();
               dir = dir.join('/');
               dir = file + '/' + dir;
-              var filePath = '/' + dir + '/' + _name;
+              var filePath = '/' + dir + '/' + name;
               filePath = filePath.replace(/\/+/g, '\/');
-              filepaths[filename] = filePath;
+              filepaths[e] = filePath;
               inner.children.push(parse(filePath));
             }
           }
@@ -12398,6 +12404,7 @@ module.exports = __webpack_require__(153);
     }
     outputData.push(mainObj);
     outputData.push(filepaths);
+    outputData.push(file);
     return outputData;
   }
   exports.ASTParser = ASTParser;
@@ -17279,11 +17286,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var pathname = window.location.pathname.split('/');
-pathname.pop();
-pathname = pathname.join('/');
-pathname += '/romeIndex.html';
-
 var Graph = function (_Component) {
   _inherits(Graph, _Component);
 
@@ -17308,7 +17310,7 @@ var Graph = function (_Component) {
             _react2.default.createElement(
               'div',
               { className: 'col-lg-12' },
-              _react2.default.createElement('webview', { src: 'http://localhost:3000', style: { height: "94.25vh" } })
+              _react2.default.createElement('webview', { src: 'http://localhost:3333', style: { height: "94.25vh" } })
             )
           )
         )
@@ -17382,7 +17384,13 @@ var Home = function (_Component) {
       _electron.remote.dialog.showOpenDialog({ properties: ['openFile'], filters: [{ name: 'JavaScript', extensions: ['js', 'jsx'] }] }, function (file) {
         componentData = _componentParser2.default.ASTParser(file[0]);
         _fs2.default.writeFileSync('app/js/graph.js', 'const data = ' + JSON.stringify(componentData, null, 2));
-        _this2.props.history.push('/graph');
+        var $this = $('#open-file');
+        var props = _this2.props;
+        $this.button('loading');
+        setTimeout(function () {
+          $this.button('reset');
+          props.history.push('/graph');
+        }, 1000);
       });
     }
   }, {
@@ -17439,7 +17447,7 @@ var Home = function (_Component) {
                       null,
                       _react2.default.createElement(
                         'a',
-                        { id: 'open-file', className: 'btn btn-primary btn-lg', role: 'button', onClick: function onClick(e) {
+                        { id: 'open-file', className: 'btn btn-primary btn-lg', role: 'button', 'data-loading-text': '<i class=\'fa fa-spinner fa-spin \'></i> Processing File', onClick: function onClick(e) {
                             e.preventDefault();
                             _this3.openFile();
                           } },

@@ -1,7 +1,3 @@
-$(function () {
-  $('[data-toggle="popover"]').popover()
-})
-
 let masterData =
   {
     "name": "App", "render": true, "children": [{
@@ -69,7 +65,7 @@ let masterData =
     }]
   }
 
-if (data) masterData[0] = data;
+if (data) masterData = data[0];
 
 
 //replace with the data you get from Steve
@@ -209,33 +205,8 @@ function update(source) {
     .attr("text-anchor", d => d.children || d._children ? "end" : "start")
     .text(d => d.name)
     .style("fill-opacity", 1e-6)
-    .attr("data-toggle", "popover")
-    .attr("data-placement", "top")
-    .attr("data-content", "Vivamus sagittis lacus vel augue laoreet rutrum faucibus.")
-    .on("click", function() {
-      console.log('click')
-      $(".text").popover();
-    })
-    .tooltip(function(d, i) {
-      console.log(d)
-      let svg1;
-      svg1 = d3.select(document.createElement("svg")).attr("height", 50);
-      g = svg1.append("g");
-      g.append("text").text("10 times the radius of the cirlce").attr("dy", "25");
-      return {
-        type: "popover",
-        title: "It's a me, Rectangle",
-        content: svg1,
-        detection: "shape",
-        placement: "fixed",
-        gravity: "bottom",
-        position: [d.x, d.y],
-        displacement: [-80, 30],
-        mousemove: false
-      };
-    })
-    // .on("mouseover", linkLines)
-    // .on("mouseout", function () { expandLinks(); d3.select(this).style("fill", "white"); d3.select("line").remove() });
+    .on("mouseover", linkLines)
+    .on("mouseout", function () { expandLinks(); d3.select(this).style("fill", "white"); d3.select("line").remove() });
 
   // Transition nodes to their new position.
   let nodeUpdate = node.transition()
@@ -327,29 +298,64 @@ let contextMenuShowing = false;
 d3.select("body").on('contextmenu', function (d, i) {
   if (contextMenuShowing) {
     d3.event.preventDefault();
-    d3.select(".popup").remove();
+    d3.select("#popup").remove();
     contextMenuShowing = false;
   } else {
     d3_target = d3.select(d3.event.target);
     if (d3_target.classed("text")) {
       let originX = coordinates[d3_target.text()].place[1];
       let originY = coordinates[d3_target.text()].place[0];
+
+      if (originX <= 85) {
+        originX = "0px";
+      } else {
+        originX = originX - 85 +'px';
+      }
+
+      if (originY <= 65) {
+        originY = "0px";
+      } else {
+        originY = originY - 65 +'px';
+      }
+      
       d3.event.preventDefault();
       contextMenuShowing = true;
       d = d3_target.datum();
       // Build the popup
       canvas = d3.select(".canvas");
       mousePosition = d3.mouse(canvas.node());
-
+      
       popup = canvas.append("div")
-      .attr("class", "popup")
-      .style("left", originX - 20 + 'px')
-      .style("top", originY - 40 + 'px');
-      popup.append("p").text("Add a Route")
-      popup.append("p")
-        .append("a")
-        .attr("href", d.link)
-        .text('YAASSSSS');
+      .attr("id", "popup")
+      .style("left", originX)
+      .style("top", originY);
+      $("#popup").append('<div class="card-header"><h6>' + d3_target.text() + '</h6></div><form><div class="form-group"><label>Route path=</label><input type="route-path" class="form-control" id="route-path" placeholder="e.g /Home"></div><div class="form-group"><label>Select a component</label><select class="form-control" id="component-list"></select></div><div class="form-check"><label class="form-check-label"><input type="checkbox" class="form-check-input" id="exact">  exact path?</label><button type="submit" class="btn btn-primary btn-xs">Submit</button></div>');
+
+      let components = Object.keys(data[1]);
+      let options = '';
+      components.forEach(comp => {
+        options += '<option>' + comp + '</option>';
+      })
+
+      $('#component-list').append(options);
+
+      $("button").click(e => {
+        e.preventDefault();
+        if ($("#route-path").val()) {
+          $.post("/addroute", {
+            node: d3_target.text(),
+            route: $('#route-path').val(),
+            exact: $('#id').val(),
+            componentToRender: $('#component-list').val(),
+            filePathObj: data[1],
+            entry: data[2]
+          }).then(()=> {
+            d3.select("#popup").remove();
+            contextMenuShowing = false;
+          });
+          $("#route-path").val("");
+        }  
+      })
     }
   }
 });

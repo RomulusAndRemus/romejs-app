@@ -1,0 +1,16 @@
+{
+  "name": "romejs-tree",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./js/d3tree.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
+  },
+  "author": "Rome JS",
+  "license": "MIT",
+  "devDependencies": {
+    "body-parser": "^1.17.1",
+    "nodemon": "^1.11.0"
+  }
+}
