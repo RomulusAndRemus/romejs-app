@@ -1,40 +1,20 @@
 const data = [
   {
-    "name": "App",
+    "name": "index",
     "children": [
       {
-        "name": "Fuck",
+        "name": "App",
         "children": [
           {
-            "name": "Puckpuck"
-          },
-          {
-            "name": "Container"
+            "name": "Counter"
           }
         ]
-      },
-      {
-        "name": "Shit"
-      },
-      {
-        "name": "Hotdamn"
-      },
-      {
-        "name": "Compo2"
-      },
-      {
-        "name": "Comp3"
       }
     ]
   },
   {
-    "Fuck": "/Users/Michael/Desktop/rome-js/reactapp2/src/Components/Fuck",
-    "Puckpuck": "/Users/Michael/Desktop/rome-js/reactapp2/src/Components/puckpuck",
-    "Container": "/Users/Michael/Desktop/rome-js/reactapp2/src/Components/Container",
-    "Shit": "/Users/Michael/Desktop/rome-js/reactapp2/src/Components/Shit",
-    "Hotdamn": "/Users/Michael/Desktop/rome-js/reactapp2/src/Components/Hotdamn",
-    "Compo2": "/Users/Michael/Desktop/rome-js/reactapp2/src/Compo2",
-    "Comp3": "/Users/Michael/Desktop/rome-js/reactapp2/src/folder1/folder2/Comp3"
+    "App": "/Users/Michael/Desktop/Old Desktop/counter-example/src/App",
+    "Counter": "/Users/Michael/Desktop/Old Desktop/counter-example/src/Counter"
   },
-  "/Users/Michael/Desktop/rome-js/reactapp2/src/App.js"
+  "/Users/Michael/Desktop/Old Desktop/counter-example/index.js"
 ]

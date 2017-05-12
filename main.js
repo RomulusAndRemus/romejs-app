@@ -1,5 +1,5 @@
 const electron = require('electron');
-const { BrowserWindow, app, dialog } = require('electron');
+const { BrowserWindow, app, dialog, globalShortcut } = require('electron');
 const Menu = electron.Menu;
 const fs = require('fs');
 const path = require('path');
@@ -126,6 +126,21 @@ function createWindow () {
     mainWindow = null
   })
 }
+
+app.on('ready', () => {
+  // Register a 'CommandOrControl+X' shortcut listener.
+  
+  const ret = globalShortcut.register('CommandOrControl+R', () => {
+    webview.reload()
+  })
+
+  if (!ret) {
+    console.log('registration failed')
+  }
+
+  // Check whether a shortcut is registered.
+  console.log(globalShortcut.isRegistered('CommandOrControl+X'))
+})
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
