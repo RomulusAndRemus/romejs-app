@@ -54,9 +54,6 @@ addRouteFunction.grabLinkRange = (src) => {
         }
       }
     }
-  }
-  
-  for (let i = 0; i < src.length; i++) {
     if (src[i] === 'r' && src[i + 1] === 'e' && src[i + 2] === 't' && src[i + 3] === 'u' && src[i + 4] === 'r' && src[i + 5] === 'n') {
       for (let j = i + 5; j < src.length; j++) {
         if (src[j] === '>') {
@@ -65,8 +62,6 @@ addRouteFunction.grabLinkRange = (src) => {
       }
     }
   }
-  
-
   return [0, 0];
 }
 

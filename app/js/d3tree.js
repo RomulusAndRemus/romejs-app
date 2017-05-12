@@ -329,7 +329,24 @@ d3.select("body").on('contextmenu', function (d, i) {
       .attr("id", "popup")
       .style("left", originX)
       .style("top", originY);
-      $("#popup").append('<div class="card-header"><h6>' + d3_target.text() + '</h6></div><form><div class="form-group"><label>Route path=</label><input type="route-path" class="form-control" id="route-path" placeholder="e.g /Home"></div><div class="form-group"><label>Select a component</label><select class="form-control" id="component-list"></select></div><div class="form-check"><label class="form-check-label"><input type="checkbox" class="form-check-input" id="exact">  exact path?</label><button type="submit" class="btn btn-primary btn-xs">Submit</button></div>');
+      $("#popup").append(
+        `<div class="card-header">
+          <h6>` + d3_target.text() + `</h6>
+        </div>
+        <form>
+          <div class="form-group">
+            <label>Route path=</label>
+            <input type="route-path" class="form-control" id="route-path" placeholder="e.g /Home">
+          </div>
+          <div class="form-group">
+            <label>Select a component</label>
+            <select class="form-control" id="component-list"></select>
+          </div>
+          <div class="form-check">
+            <label class="form-check-label">
+            <input type="checkbox" class="form-check-input" id="exact">  exact path?</label>
+            <button type="submit" class="btn btn-primary btn-xs">Submit</button>
+          </div>`);
 
       let components = Object.keys(data[1]);
       let options = '';
