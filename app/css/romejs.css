@@ -281,15 +281,17 @@ ul.alert-dropdown {
 }
 
 
-.popup {
+#popup {
     position: absolute;
     left: 0;
     top: 0;
     background-color: #fff;
-    width: 100px;
+    height: 105px;
+    width: 160px;
     border: 1px #ccc solid;
-    border-radius: 3px;
+    border-radius: 5px 5px 0px 5px;
     box-shadow: #333 2px 2px 4px;
     padding: 8px;
-    font-family: arial, helvetica, sans-serif;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 8px;
 }

@@ -6,7 +6,7 @@
   "scripts": {
     "build": "webpack -w",
     "package": "electron-packager ./ --icon=app/images/romejs.icns --overwrite",
-    "start": "electron . | node server.js"
+    "start": "electron . | node app/server.js"
   },
   "productName": "RomeJS",
   "keywords": [
@@ -29,7 +29,6 @@
   },
   "dependencies": {
     "bootstrap": "^3.3.7",
-    "d3": "^3.5.17",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
     "react-router-dom": "^4.1.1"

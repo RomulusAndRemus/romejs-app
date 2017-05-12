@@ -33,37 +33,43 @@
       let filename = file.pop();
       file = file.join('/');
       filename = filename.slice(0, -3);
-      inner.name = filename;
 
       let ast = eau.parse(src);
 
-      let imports = esquery(ast, "ImportDeclaration");
       let importVars = {};
 
-      for (let i = 0; ast.body[i].type === "ImportDeclaration";  i++) {
-        if (ast.body[i].specifiers.length > 0) {
-          let name = ast.body[i].specifiers[0].local.name
-            importVars[name] = ast.body[i].source.value
-        }
-      }
-
-      const reactComponents = [];
-      let components = esquery(ast, "JSXOpeningElement");
-
-      for (let i = 0; i < components.length; i++) {
-        for (let j = 0; j < components[i].attributes.length; j++) {
-          if (components[i].attributes[j].name.name === "component") {
-            reactComponents.push(components[i].attributes[j].value.expression.name);
+      ast.body.forEach(elem => {
+        if (elem.type === 'ImportDeclaration') {
+          if (elem.specifiers.length > 0) {
+            let name = elem.specifiers[0].local.name;
+              importVars[name] = elem.source.value;
           }
         }
-      }
-
-      let identifiers = esquery(ast, "JSXIdentifier");
-      for (let i = 0; i < identifiers.length; i += 1) {
-        if (importVars.hasOwnProperty(identifiers[i].name) && identifiers[i].name !== "Router" && identifiers[i].name !== "path") {
-          reactComponents.push(identifiers[i].name);
+        if (elem.type === 'ExportDefaultDeclaration') {
+          inner.name = elem.declaration.name;
         }
-      }
+      });
+
+      if (!inner.name) inner.name = filename;
+
+      const reactComponents = [];
+      let components = esquery(ast, 'JSXOpeningElement');
+
+      components.forEach(component => {
+        component.attributes.forEach(comp => {
+          if (comp.name.name === 'component') {
+            reactComponents.push(comp.value.expression.name);
+          }
+        });
+      });
+
+      let identifiers = esquery(ast, 'JSXIdentifier');
+
+      identifiers.forEach(identifier => {
+        if (importVars.hasOwnProperty(identifier.name) && identifier.name !== 'Router' && identifier.name !== 'path') {
+          reactComponents.push(identifier.name);
+        }
+      })
 
       if (reactComponents.length > 0){
         inner.children = [];
@@ -77,7 +83,7 @@
               dir = file + '/' + dir;
               let filePath = '/' + dir + '/' + name;
               filePath = filePath.replace(/\/+/g, '\/');
-              filepaths[filename] = filePath;
+              filepaths[e] = filePath;
               inner.children.push(parse(filePath));
             }
           }
@@ -87,6 +93,7 @@
     }
     outputData.push(mainObj);
     outputData.push(filepaths);
+    outputData.push(file);
     return outputData;
   }
   exports.ASTParser = ASTParser;

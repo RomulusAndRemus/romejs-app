@@ -15,7 +15,13 @@ class Home extends Component {
     remote.dialog.showOpenDialog({ properties: [ 'openFile'], filters: [{ name: 'JavaScript', extensions: ['js', 'jsx'] }]}, (file) => {
       componentData = componentParser.ASTParser(file[0]);
       fs.writeFileSync('app/js/graph.js', 'const data = ' + JSON.stringify(componentData, null, 2));
-      this.props.history.push('/graph');
+      let $this = $('#open-file');
+      let props = this.props;
+      $this.button('loading');
+        setTimeout(function() {
+          $this.button('reset');
+          props.history.push('/graph')
+      }, 1000);
     });
   }
   render() {
@@ -37,7 +43,7 @@ class Home extends Component {
                   <div className="jumbotron">
                       <h1>Welcome to RomeJS</h1>
                       <p>Let's get started! Please select the entry point of your React application. This is file that contains your Router opening element.</p>
-                      <p><a id="open-file" className="btn btn-primary btn-lg" role="button" onClick={e => {
+                      <p><a id="open-file" className="btn btn-primary btn-lg" role="button" data-loading-text="<i class='fa fa-spinner fa-spin '></i> Processing File" onClick={e => {
                         e.preventDefault();
                         this.openFile();
                         }}>Open file &raquo;</a>
