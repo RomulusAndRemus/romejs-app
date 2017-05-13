@@ -12323,6 +12323,9 @@ module.exports = __webpack_require__(153);
     //Grabs the import variables and stores the variable name as the key and the path as the value
     var filepaths = {};
 
+    var routePaths = [];
+    var linkedComponents = {};
+
     //Parses through the React app and extracts the components
     var mainObj = parse(file);
     function parse(entry) {
@@ -12375,16 +12378,38 @@ module.exports = __webpack_require__(153);
       if (!inner.name) inner.name = filename;
 
       var reactComponents = [];
+      var linkedTo = [];
 
       //Checks the AST for <Route path='/thispath component={thiscomponent} /> and grabs the component if it was found in the import variables'
       var components = esquery(ast, 'JSXOpeningElement');
       components.forEach(function (component) {
-        component.attributes.forEach(function (comp) {
-          if (comp.name.name === 'component') {
-            reactComponents.push(comp.value.expression.name);
-          }
-        });
+        if (component.name.name === 'Route') {
+          var paths = {};
+          var routePath = void 0;
+          component.attributes.forEach(function (comp) {
+            if (comp.name.name === 'path' && comp.value.value) routePath = comp.value.value;
+            if (comp.name.name === 'component') {
+              reactComponents.push(comp.value.expression.name);
+              if (routePath) paths[comp.value.expression.name] = routePath;
+            }
+          });
+          if (Object.keys(paths).length) routePaths.push(paths);
+        }
+        if (component.name.name === 'Link') {
+          component.attributes.forEach(function (comp) {
+            if (comp.name.name === 'to') {
+              routePaths.forEach(function (route) {
+                var keys = Object.keys(route);
+                if (route[keys[0]] === comp.value.value) {
+                  linkedTo.push(keys[0]);
+                }
+              });
+            }
+          });
+        }
       });
+
+      if (linkedTo.length) linkedComponents[inner.name] = linkedTo;
 
       //Checks the AST for components from import variables to see which are rendered. import Comp1 from './Comp1' -> <Comp1 />
       var identifiers = esquery(ast, 'JSXIdentifier');
@@ -12429,6 +12454,7 @@ module.exports = __webpack_require__(153);
     outputData.push(filepaths);
     //Name of the entry file
     outputData.push(file);
+    outputData.push(linkedComponents);
     return outputData;
   }
   exports.ASTParser = ASTParser;
