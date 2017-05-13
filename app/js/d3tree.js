@@ -65,14 +65,16 @@ let masterData =
     }]
   }
 
-if (data) masterData = data[0];
-
-
 //replace with the data you get from Steve
-const routeLinks = {
+let routeLinks = {
   "Joel": ["Seius", "Sergius", "Servilius", "Sextius", "Sicinius", "Curius", "Oidius", "Minius", "Container", "Aebutius"],
   "App": ["Ulpius", "Curius", "Numicius"],
   "Mike": ["Vipsanius", "Ulpius", "Oidius", "App", "Sergius"]
+}
+
+if (data) {
+  masterData = data[0];
+  routeLinks = data[3];
 }
 
 const links = Object.keys(routeLinks);
@@ -157,7 +159,7 @@ function expandLinks(linkData) {
       routeLinks[link].forEach(el => {
         if (coordinates[el]) {
           let thisId = "#" + el;
-          d3.select(thisId + " circle").transition().duration(1200).style("fill", "black");
+          d3.select(thisId + " circle").transition().duration(1200).style("fill", renderRed);
         }
       })
     }
@@ -165,12 +167,9 @@ function expandLinks(linkData) {
 }
 
 function renderRed(d) {
-  // console.log(d)
   if (!d.render) {
-    // console.log(d);
     return d._children ? "#42f4aa" : "#000000"
   } else {
-    // console.log(d, 'this should be red')
     return "red"
   }
 }

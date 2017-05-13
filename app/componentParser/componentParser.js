@@ -12,6 +12,9 @@
     //Grabs the import variables and stores the variable name as the key and the path as the value
     const filepaths = {};
 
+    const routePaths = [];
+    const linkedComponents = {};
+
     //Parses through the React app and extracts the components
     const mainObj = parse(file);
     function parse (entry){
@@ -65,16 +68,38 @@
       if (!inner.name) inner.name = filename;
 
       const reactComponents = [];
+      const linkedTo = [];
 
       //Checks the AST for <Route path='/thispath component={thiscomponent} /> and grabs the component if it was found in the import variables'
       let components = esquery(ast, 'JSXOpeningElement');
       components.forEach(component => {
-        component.attributes.forEach(comp => {
-          if (comp.name.name === 'component') {
-            reactComponents.push(comp.value.expression.name);
-          }
-        });
+        if (component.name.name === 'Route') {
+          let paths = {};
+          let routePath;
+          component.attributes.forEach(comp => {
+            if (comp.name.name === 'path' && comp.value.value) routePath = comp.value.value;
+            if (comp.name.name === 'component') {        
+              reactComponents.push(comp.value.expression.name);
+              if (routePath) paths[comp.value.expression.name] = routePath;
+            }
+          });
+          if (Object.keys(paths).length) routePaths.push(paths);
+        }
+        if (component.name.name === 'Link') {
+          component.attributes.forEach(comp => {
+            if (comp.name.name === 'to') {
+              routePaths.forEach(route => {
+                const keys = Object.keys(route);
+                if (route[keys[0]] === comp.value.value) {
+                  linkedTo.push(keys[0]);
+                }
+              });
+            }
+          });
+        }
       });
+
+      if (linkedTo.length) linkedComponents[inner.name] = linkedTo;
 
       //Checks the AST for components from import variables to see which are rendered. import Comp1 from './Comp1' -> <Comp1 />
       let identifiers = esquery(ast, 'JSXIdentifier');
@@ -119,6 +144,7 @@
     outputData.push(filepaths);
     //Name of the entry file
     outputData.push(file);
+    outputData.push(linkedComponents);
     return outputData;
   }
   exports.ASTParser = ASTParser;
