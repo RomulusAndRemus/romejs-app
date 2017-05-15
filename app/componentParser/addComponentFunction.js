@@ -66,13 +66,18 @@ addComponentFunction.grabChildComponentRanges = function(entry){
 
 
   for (let i = 0; i < src.length; i++){
+    if (src[i] === "R" && src[i+1] === "O" && src[i+2] === "M" && src[i+3] === "E" && src[i+4] === " "){
+      ranges["comp"] = [i, i+3];
+    } else if (src[i] === "R" && src[i+1] === "O" && src[i+2] === "M" && src[i+3] === "E"){
+      ranges["export"] = [i, i+3]
+    }
   }
 
-  return ranges
+  return ranges;
 }
 
 
-addComponentFunction.writeChildComponent = function(childComponentName, parentComponentName){
+addComponentFunction.writeChildComponent = function(childComponentName, parentComponentName, parentFilePath){
   //write boiler plate in different file,  stringify it, then writeFileSync
   if (addComponentFunction.isReactRouterV4installed){
     let boilerPlateSrc = fs.readFileSync("./addComponentBoilerPlateReactRouter.js");
@@ -94,17 +99,25 @@ addComponentFunction.writeChildComponent = function(childComponentName, parentCo
   let ranges = addComponentFunction.grabChildComponentRanges(chlidSrc);
 
   let compCode2inject = "class " + childComponentName + " extends Component"
-  let exportCode2inject = "export default " + childComponentName
+  let exportCode2inject = "export default " + childComponentName + ";"
+
+  if (childComponent.length < 4){
+    while (childComponent.length !== 4){
+      childComponent += childComponent + " ";
+    }
+  }
+
+  let add = childComponent.length - 4;
 
 
-  eau.replaceCodeRange(childSrc,ranges['comp'], compCode2inject)
-  eau.replaceCodeRange(childSrc,ranges['export'], exportCode2inject)
-
-  /*need to grab parent SRC file!!!*/
+  eau.replaceCodeRange(childSrc,[ranges['comp'][0], ranges['comp'][1] + add], compCode2inject)
+  eau.replaceCodeRange(childSrc,[ranges['export'][0] + add, ranges['export'][1] + add], exportCode2inject)
 
   addComponentFunction.addComponentToMother(parentSrc, childComponentName, childFilePath)
 
-  //push childComponentName: childFilePath into masterObject
+  //PUSH CHILDCOMPONENTNAME: CHILDFILEPATH INTO MASTEROBJECT!!!!!!!
+
+  return;
 }
 
 module.exports = addComponentFunction;
