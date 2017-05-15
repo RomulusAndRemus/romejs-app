@@ -3,7 +3,6 @@ const path = require('path');
 const eau = require('./esprima-ast-utils/index.js');
 
 
-let childRoute = null;
 
 addComponentFunction.findComponentRange = function(src){
 
@@ -73,11 +72,18 @@ addComponentFunction.grabChildComponentRanges = function(entry){
 }
 
 
-addComponentFunction.writeChildComponent = function(boilerPlateSrc, childComponentName, parentComponentName){
+addComponentFunction.writeChildComponent = function(childComponentName, parentComponentName){
   //write boiler plate in different file,  stringify it, then writeFileSync
-  let boilerPlateSrc = fs.readFileSync(boilerPlateSrc);
+  if (addComponentFunction.isReactRouterV4installed){
+    let boilerPlateSrc = fs.readFileSync("./addComponentBoilerPlateReactRouter.js");
+  } else {
+    let boilerPlateSrc = fs.readFileSync("./addComponentBoilerPlate.js";
+  }
+
   boilerPlateSrc = boilerPlateSrc.toString();
   let counter = 0;
+
+
 
   fs.createReadStream(__dirname + "/" + boilerPlateSrc).pipe(fs.createWriteStream(__dirname+'romanChild' + counter + ".js"));
 
