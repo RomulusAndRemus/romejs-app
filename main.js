@@ -127,21 +127,6 @@ function createWindow () {
   })
 }
 
-app.on('ready', () => {
-  // Register a 'CommandOrControl+X' shortcut listener.
-  
-  const ret = globalShortcut.register('CommandOrControl+R', () => {
-    webview.reload()
-  })
-
-  if (!ret) {
-    console.log('registration failed')
-  }
-
-  // Check whether a shortcut is registered.
-  console.log(globalShortcut.isRegistered('CommandOrControl+X'))
-})
-
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
