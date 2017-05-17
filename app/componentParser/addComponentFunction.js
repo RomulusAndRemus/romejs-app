@@ -77,7 +77,7 @@ addComponentFunction.grabChildComponentRanges = function(entry){
 }
 
 
-addComponentFunction.writeChildComponent = function(childComponentName, parentComponentName, parentFilePath){
+addComponentFunction.writeChildComponent = function(childComponentName, parentComponentName, filePathObj){
   //write boiler plate in different file,  stringify it, then writeFileSync
   if (addComponentFunction.isReactRouterV4installed){
     let boilerPlateSrc = fs.readFileSync("./addComponentBoilerPlateReactRouter.js");
@@ -90,9 +90,9 @@ addComponentFunction.writeChildComponent = function(childComponentName, parentCo
 
 
 
-  fs.createReadStream(__dirname + "/" + boilerPlateSrc).pipe(fs.createWriteStream(__dirname+'romanChild' + counter + ".js"));
+  fs.createReadStream(__dirname + "/" + boilerPlateSrc).pipe(fs.createWriteStream(__dirname+ childComponentName + ".js"));
 
-  let childFilePath = __dirname + '/romanChild' + counter + ".js";
+  let childFilePath = __dirname + "/" + childComponentName + ".js";
   let childSrc = fs.readFileSync(childFilePath);
   childSrc.toString();
 
@@ -115,7 +115,6 @@ addComponentFunction.writeChildComponent = function(childComponentName, parentCo
 
   addComponentFunction.addComponentToMother(parentSrc, childComponentName, childFilePath)
 
-  //PUSH CHILDCOMPONENTNAME: CHILDFILEPATH INTO MASTEROBJECT!!!!!!!
 
   return;
 }

@@ -4276,6 +4276,7 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   padding: 15px 15px;
   font-size: 18px;
   line-height: 20px;
+  color: #42f4aa;
 }
 .navbar-brand:hover,
 .navbar-brand:focus {
@@ -6753,4 +6754,8 @@ button.close {
     display: none !important;
   }
 }
+
+
+
+
 /*# sourceMappingURL=bootstrap.css.map */

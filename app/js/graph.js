@@ -1,20 +1,37 @@
 const data = [
   {
-    "name": "index",
+    "name": "App",
     "children": [
       {
-        "name": "App",
-        "children": [
-          {
-            "name": "Counter"
-          }
-        ]
+        "name": "Container"
+      },
+      {
+        "name": "Fuck"
+      },
+      {
+        "name": "Shit"
+      },
+      {
+        "name": "Hotdamn"
       }
     ]
   },
   {
-    "App": "/Users/Michael/Desktop/Old Desktop/counter-example/src/App",
-    "Counter": "/Users/Michael/Desktop/Old Desktop/counter-example/src/Counter"
+    "Container": "/Users/joelguizar/Desktop/practice projects/reactapp2/src/Components/Container",
+    "Fuck": "/Users/joelguizar/Desktop/practice projects/reactapp2/src/Components/Fuck.js",
+    "Shit": "/Users/joelguizar/Desktop/practice projects/reactapp2/src/Components/Shit",
+    "Hotdamn": "/Users/joelguizar/Desktop/practice projects/reactapp2/src/Components/Hotdamn"
   },
-  "/Users/Michael/Desktop/Old Desktop/counter-example/index.js"
+  "/Users/joelguizar/Desktop/practice projects/reactapp2/src/App.js",
+  {
+    "Fuck": [
+      "Container"
+    ],
+    "Shit": [
+      "Container"
+    ],
+    "Hotdamn": [
+      "Container"
+    ]
+  }
 ]

@@ -11,7 +11,7 @@ const Nav = () => {
           <span className="icon-bar"></span>
           <span className="icon-bar"></span>
         </button>
-        <Link to="/home" className="navbar-brand"><i className="fa fa-fw fa-university"></i> RomeJS</Link>
+        <Link to="/home" className="navbar-brand"><i className="fa fa-fw fa-university" id="headerheader"></i> RomeJS</Link>
       </div>
       <div className="collapse navbar-collapse navbar-ex1-collapse">
         <ul className="nav navbar-nav side-nav">
