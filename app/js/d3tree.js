@@ -72,10 +72,10 @@ let routeLinks = {
   "Mike": ["Vipsanius", "Ulpius", "Oidius", "App", "Sergius"]
 }
 
-if (data) {
-  masterData = data[0];
-  routeLinks = data[3];
-}
+// if (data) {
+//   masterData = data[0];
+//   routeLinks = data[3];
+// }
 
 const links = Object.keys(routeLinks);
 

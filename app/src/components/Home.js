@@ -9,21 +9,6 @@ class Home extends Component {
   constructor(props){
     super(props);
   }
-
-  openFile() {
-    let componentData;
-    remote.dialog.showOpenDialog({ properties: [ 'openFile'], filters: [{ name: 'JavaScript', extensions: ['js', 'jsx'] }]}, (file) => {
-      componentData = componentParser.ASTParser(file[0]);
-      fs.writeFileSync('app/js/graph.js', 'const data = ' + JSON.stringify(componentData, null, 2));
-      let $this = $('#open-file');
-      let props = this.props;
-      $this.button('loading');
-        setTimeout(function() {
-          $this.button('reset');
-          props.history.push('/graph')
-      }, 1000);
-    });
-  }
   render() {
     return (
       <div className="page-wrapper" className="home-page">
@@ -45,7 +30,24 @@ class Home extends Component {
                       <p>Let's get started! Please select the entry point of your React application. This is file that contains your Router opening element.</p>
                       <p><a id="open-file" className="btn btn-primary btn-lg" role="button" data-loading-text="<i class='fa fa-spinner fa-spin '></i> Processing File" onClick={e => {
                         e.preventDefault();
-                        this.openFile();
+                        let self = this;
+
+                        const openPromiseGen = () => new Promise((resolve, reject) => {
+                          this.props.openFile(resolve);
+                        });
+
+                        (async function openThis() {
+                          await openPromiseGen();
+                          let $this = $('#open-file');
+                          let props = self.props;
+                          $this.button('loading');
+                            setTimeout(function() {
+                              $this.button('reset');
+                              props.history.push('/graph');
+                              console.log(props)
+                          }, 1000);
+                        })()
+
                         }}>Open file &raquo;</a>
                       </p>
                   </div>
