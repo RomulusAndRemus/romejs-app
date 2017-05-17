@@ -8698,7 +8698,7 @@ module.exports = require("electron");
           var routePath = void 0;
           component.attributes.forEach(function (comp) {
             if (comp.name.name === 'path' && comp.value.value) routePath = comp.value.value;
-            if (comp.name.name === 'component') {
+            if (comp.name.name === 'component' && !reactComponents.includes(comp.value.expression.name)) {
               reactComponents.push(comp.value.expression.name);
               if (routePath) paths[comp.value.expression.name] = routePath;
             }
@@ -12428,13 +12428,13 @@ var _Editor = __webpack_require__(113);
 
 var _Editor2 = _interopRequireDefault(_Editor);
 
-var _Dashboard = __webpack_require__(112);
-
-var _Dashboard2 = _interopRequireDefault(_Dashboard);
-
 var _Blank = __webpack_require__(111);
 
 var _Blank2 = _interopRequireDefault(_Blank);
+
+var _Redirect = __webpack_require__(244);
+
+var _Redirect2 = _interopRequireDefault(_Redirect);
 
 var _componentParser = __webpack_require__(69);
 
@@ -12482,11 +12482,9 @@ var App = function (_Component) {
     value: function openFile(callback) {
       var _this2 = this;
 
-      var componentData = void 0;
-      var filename = void 0;
       _electron.remote.dialog.showOpenDialog({ properties: ['openFile'], filters: [{ name: 'JavaScript', extensions: ['js', 'jsx'] }] }, function (file) {
-        componentData = _componentParser2.default.ASTParser(file[0]);
-        filename = file[0];
+        _this2.fileParser(file[0]);
+        var filename = file[0];
         var filepath = filename.split('/');
         filepath.pop();
         filepath = filepath.join('/');
@@ -12494,9 +12492,15 @@ var App = function (_Component) {
           filename: filename,
           filepath: filepath
         });
-        _fs2.default.writeFileSync('app/js/graph.js', 'const data = ' + JSON.stringify(componentData, null, 2));
         callback();
       });
+    }
+  }, {
+    key: 'fileParser',
+    value: function fileParser(file) {
+      var componentData = void 0;
+      componentData = _componentParser2.default.ASTParser(file);
+      _fs2.default.writeFileSync('app/js/graph.js', 'const data = ' + JSON.stringify(componentData, null, 2));
     }
   }, {
     key: 'fileTree',
@@ -12533,7 +12537,7 @@ var App = function (_Component) {
           'div',
           { id: 'wrapper' },
           _react2.default.createElement(_reactRouterDom.Route, { render: function render(props) {
-              return _react2.default.createElement(_Nav2.default, _extends({}, props, { fileTree: _this4.fileTree, filename: _this4.state.filename, filepath: _this4.state.filepath, selectedFile: _this4.selectedFile }));
+              return _react2.default.createElement(_Nav2.default, _extends({}, props, { fileTree: _this4.fileTree, filename: _this4.state.filename, filepath: _this4.state.filepath, selectedFile: _this4.selectedFile, fileParser: _this4.fileParser }));
             } }),
           _react2.default.createElement(_reactRouterDom.Route, { exact: true, path: index, render: function render(props) {
               return _react2.default.createElement(_Home2.default, _extends({}, props, { openFile: _this4.openFile }));
@@ -12545,9 +12549,11 @@ var App = function (_Component) {
           _react2.default.createElement(_reactRouterDom.Route, { path: '/editor', render: function render(props) {
               return _react2.default.createElement(_Editor2.default, _extends({}, props, { index: index, filename: _this4.state.filename }));
             } }),
-          _react2.default.createElement(_reactRouterDom.Route, { path: '/dashboard', component: _Dashboard2.default }),
           _react2.default.createElement(_reactRouterDom.Route, { path: '/blank', render: function render(props) {
-              return _react2.default.createElement(_Blank2.default, _extends({}, props, { index: index, filename: _this4.state.filename }));
+              return _react2.default.createElement(_Blank2.default, props);
+            } }),
+          _react2.default.createElement(_reactRouterDom.Route, { path: '/redirect', render: function render(props) {
+              return _react2.default.createElement(_Redirect2.default, props);
             } })
         )
       );
@@ -16706,12 +16712,7 @@ var Blank = function (_Component) {
 exports.default = Blank;
 
 /***/ }),
-/* 112 */
-/***/ (function(module, exports) {
-
-throw new Error("Module build failed: Error: ENOENT: no such file or directory, open '/Users/Michael/Desktop/romejs-app/app/src/components/Dashboard.js'\n    at Error (native)");
-
-/***/ }),
+/* 112 */,
 /* 113 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -16996,7 +16997,6 @@ var Home = function (_Component) {
                               setTimeout(function () {
                                 $this.button('reset');
                                 props.history.push('/graph');
-                                console.log(props);
                               }, 1000);
                             })();
                           } },
@@ -17048,13 +17048,21 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var Nav = function (_Component) {
   _inherits(Nav, _Component);
 
-  function Nav() {
+  function Nav(props) {
     _classCallCheck(this, Nav);
 
-    return _possibleConstructorReturn(this, (Nav.__proto__ || Object.getPrototypeOf(Nav)).apply(this, arguments));
+    var _this = _possibleConstructorReturn(this, (Nav.__proto__ || Object.getPrototypeOf(Nav)).call(this, props));
+
+    _this.clickHandler = _this.clickHandler.bind(_this);
+    return _this;
   }
 
   _createClass(Nav, [{
+    key: 'clickHandler',
+    value: function clickHandler() {
+      this.props.fileParser(this.props.filename);
+    }
+  }, {
     key: 'render',
     value: function render() {
       if (this.props.filename) {
@@ -17140,9 +17148,9 @@ var Nav = function (_Component) {
               null,
               _react2.default.createElement(
                 _reactRouterDom.Link,
-                { to: '/blank' },
-                _react2.default.createElement('i', { className: 'fa fa-fw fa-file' }),
-                ' Support'
+                { to: '/redirect', onClick: this.clickHandler },
+                _react2.default.createElement('i', { className: 'fa fa-fw fa-refresh' }),
+                ' Refresh'
               )
             )
           )
@@ -37828,6 +37836,75 @@ var valueEqual = function valueEqual(a, b) {
 };
 
 exports.default = valueEqual;
+
+/***/ }),
+/* 244 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(4);
+
+var _react2 = _interopRequireDefault(_react);
+
+var _reactRouterDom = __webpack_require__(32);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Redirect = function (_Component) {
+  _inherits(Redirect, _Component);
+
+  function Redirect() {
+    _classCallCheck(this, Redirect);
+
+    return _possibleConstructorReturn(this, (Redirect.__proto__ || Object.getPrototypeOf(Redirect)).apply(this, arguments));
+  }
+
+  _createClass(Redirect, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      var _this2 = this;
+
+      setTimeout(function () {
+        _this2.props.history.push('/graph');
+      }, 50);
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      return _react2.default.createElement(
+        'div',
+        { className: 'page-wrapper' },
+        _react2.default.createElement(
+          'div',
+          { className: 'container-fluid' },
+          _react2.default.createElement(
+            'div',
+            { className: 'row' },
+            _react2.default.createElement('div', { className: 'col-lg-12' })
+          )
+        )
+      );
+    }
+  }]);
+
+  return Redirect;
+}(_react.Component);
+
+exports.default = Redirect;
 
 /***/ })
 /******/ ]);

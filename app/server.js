@@ -2,8 +2,8 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const bodyParser = require('body-parser');
-const addRouteFunction = require('./componentParser/addRouteFunction')
-const addComponentFunction = require('./componentParser/addComponentFunction')
+const addRouteFunction = require('./componentParser/addRouteFunction');
+const addComponentFunction = require('./componentParser/addComponentFunction');
 
 const PORT = 3333;
 
@@ -23,13 +23,13 @@ app.get('/', (req, res) => {
 })
 
 app.post('/addroute', (req, res, next) => {
-  addRouteFunction.addRouteAndLink(req.body.node, req.body.route, true, req.body.componentToRender, req.body.filePathObj, req.body.entry);
-  res.end();
+  addRouteFunction.addRouteAndLink(req.body.node, req.body.route, true, req.body.componentToRender, req.body.filePathObj, req.body.entry, next);
+  res.status(200).end();
 })
 
 app.post('/addCompo', (req, res, next) => {
-  addComponentFunction.writeChildComponent(req.body.componentName, req.body.node, req.body.filePathObj);
-  res.end();
+  addComponentFunction.writeChildComponent(req.body.componentName, req.body.node, req.body.filePathObj, next);
+  res.status(200).end();
 })
 
 app.use(express.static(path.join(__dirname, '/')));

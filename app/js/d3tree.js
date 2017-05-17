@@ -1,81 +1,12 @@
-let masterData =
-  {
-    "name": "App", "render": true, "children": [{
-      'name': 'Container',
-      'children': [
-        { 'name': 'Aebutius', 'size': 3000 },
-        {
-          'name': 'Aelius',
-          "render": true,
-          'children': [
-            { 'name': 'Atius', 'size': 3000, "links": ["Ship", "Compo3"] },
-            { 'name': 'Aurelius' }
-          ]
-        },
-        { 'name': 'Curius', links: 4000, size: 3000 },
-        {
-          'name': 'Genucius', 'children': [
-            { 'name': 'Herennius', 'size': 3000, "links": ["Ship", "Compo3"] },
-            { 'name': 'Geminius' }
-          ], 'size': 3000
-        },
-        {
-          'name': 'Livius', 'children': [
-            { 'name': 'Mike', 'size': 3000, "links": ["Ship", "Compo3"] },
-            {
-              'name': 'Pontius', 'children': [
-                { 'name': 'Papirius', 'size': 3000, "links": ["Ship", "Compo3"] },
-                {
-                  'name': 'Salonius', 'children': [
-                    { 'name': 'Seius', 'size': 3000, "links": ["Ship", "Compo3"] },
-                    { 'name': 'Sergius', }, { "name": "Servilius" }, { "name": "Sextius" }, { "name": "Sicinius" }
-                  ]
-                }
-              ]
-            }
-          ], 'size': 3000
-        },
-        { 'name': 'Tullius', 'size': 3000 },
-        { 'name': 'Ulpius', 'size': 3000 },
-        {
-          'name': 'Valerius', 'children': [
-            { 'name': 'Vitruvius', 'size': 3000, "links": ["Ship", "Compo3"] },
-            { 'name': 'Vipsanius' }
-          ], 'size': 3000
-        },
-        { 'name': 'Numicius', 'size': 3000 },
-        { 'name': 'Naevius', 'size': 3000 },
-        {
-          'name': 'Nautius', 'children': [{ 'name': 'Jupiter' },
-          { 'name': 'Lucilius', 'size': 3000, "links": ["Ship", "Compo3"] },
-          { 'name': 'Joel' }
-          ], 'size': 3000
-        },
-        { 'name': 'Manlius', 'size': 3000 },
-        { 'name': 'Minius', 'size': 3000 },
-        {
-          'name': 'Lartius', 'children': [
-            { 'name': 'Dulius', 'size': 3000, "links": ["Ship", "Compo3"] },
-            { 'name': 'Didius' }
-          ], 'size': 3000
-        },
-        { 'name': 'Cloelius', 'size': 3000 },
-        { 'name': 'Artorius', 'size': 3000 },
-      ],
-    }]
-  }
+let masterData ={};
 
 //replace with the data you get from Steve
-let routeLinks = {
-  "Joel": ["Seius", "Sergius", "Servilius", "Sextius", "Sicinius", "Curius", "Oidius", "Minius", "Container", "Aebutius"],
-  "App": ["Ulpius", "Curius", "Numicius"],
-  "Mike": ["Vipsanius", "Ulpius", "Oidius", "App", "Sergius"]
-}
+let routeLinks = {};
 
-// if (data) {
-//   masterData = data[0];
-//   routeLinks = data[3];
-// }
+if (data) {
+  masterData = data[0];
+  routeLinks = data[3];
+}
 
 const links = Object.keys(routeLinks);
 
@@ -88,7 +19,7 @@ let interCount = 0;
 
 const margin = { top: 0, right: 20, bottom: 20, left: 80 },
   width = 1600 - margin.right - margin.left,
-  height = 420 - margin.top - margin.bottom;
+  height = 570 - margin.top - margin.bottom;
 
 let i = 0,
   duration = 750,
@@ -110,6 +41,27 @@ let svg = d3.select(".canvas").append("svg")
 root = masterData;
 root.x0 = height / 2;
 root.y0 = 0;
+
+function expand(d){   
+    let children = (d.children) ? d.children : d._children;
+    if (d._children) {        
+        d.children = d._children;
+        d._children = null;       
+    }
+    if (children)
+      children.forEach(expand);
+}
+
+function expandAll(){
+    expand(root); 
+    update(root);
+}
+
+function collapseAll(){
+    root.children.forEach(collapse);
+    collapse(root);
+    update(root);
+}
 
 function collapse(d) {
   if (d.children) {
@@ -389,7 +341,6 @@ d3.select("body").on('contextmenu', function (d, i) {
       })
 
       $('#component-list').append(options);
-
 
       $("#submitRoute").click(e => {
         e.preventDefault();

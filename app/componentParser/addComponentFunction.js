@@ -9,7 +9,7 @@ const addComponentFunction = {};
 addComponentFunction.findComponentRange = function(src){
 
   for (let i = 0; i < src.length; i++) {
-    if (src[i] === 'r' && src[i + 1] === 'e' && src[i + 2] === 'n' && src[i + 3] === 'd' && src[i + 4] === 'e' && src[i + 5] === 'r' && src[i + 6] === '>') {
+    if (src[i] === 'r' && src[i + 1] === 'e' && src[i + 2] === 'n' && src[i + 3] === 'd' && src[i + 4] === 'e' && src[i + 5] === 'r') {
       for(let j = i+7; j < src.length; j++){
         if (src[j] === '>'){
           return [j+1, j+2]
@@ -23,15 +23,19 @@ addComponentFunction.findComponentRange = function(src){
 
 
 addComponentFunction.addComponentToMother = function (src, componentName, childFilepath){
-  src = fs.readFileSync(src);
-  src = src.toString();
-  let parentTree = eau.parse(src);
-  let JSXCodeToInject = "<" + componentName + " />"
-  let importCodetoInject = "import " + componentName + " from" + '"' + childFilepath + '"';
+  srcString = fs.readFileSync(src).toString();
+
+  let filename = childFilepath.split('/');
+  filename = filename.pop();
+  let parentTree = eau.parse(srcString);
+  let JSXCodeToInject = "\n\t<" + componentName + " />\n"
+  let importCodetoInject = "import " + componentName + " from " + '"./' + filename + '"\n';
   let importVarRange = [0,0]
 
-  eau.replaceCodeRange(parentTree, importVarRange, importCodetoInject)
-  eau.replaceCodeRange(parentTree, addComponentFunction.findComponentRange(src), JSXCodeToInject)
+  let generated = eau.replaceCodeRange(parentTree, importVarRange, importCodetoInject);
+  let parsed = eau.parse(generated);
+  let code = eau.replaceCodeRange(parsed, addComponentFunction.findComponentRange(generated), JSXCodeToInject);
+  fs.writeFileSync(src, code);
 }
 
 addComponentFunction.isReactRouterV4installed = function(src){
@@ -57,10 +61,10 @@ addComponentFunction.grabChildComponentRanges = function(entry){
   let src;
 
   if (addComponentFunction.isReactRouterV4installed(entrySrc)){
-    src = fs.readFileSync("/Users/joelguizar/Desktop/romejs-app/app/componentParser/addComponentBoilerPlateReactRouter.js");
+    src = fs.readFileSync(path.resolve(__dirname, './addComponentBoilerPlateReactRouter.js'));
     src = src.toString();
   } else {
-    src = fs.readFileSync("/Users/joelguizar/Desktop/romejs-app/app/componentParser/addComponentBoilerPlate.js");
+    src = fs.readFileSync(path.resolve(__dirname, './addComponentBoilerPlateReactRouter.js'));
     src = src.toString();
   }
 
@@ -80,22 +84,25 @@ addComponentFunction.grabChildComponentRanges = function(entry){
 }
 
 
-addComponentFunction.writeChildComponent = function(childComponentName, parentComponentName, filePathObj){
+addComponentFunction.writeChildComponent = function(childComponentName, parentComponentName, filePathObj, next){
   //write boiler plate in different file,  stringify it, then writeFileSync
-
 
   let boilerPlateSrc;
 
   if (addComponentFunction.isReactRouterV4installed){
-    boilerPlateSrc = fs.readFileSync("/Users/joelguizar/Desktop/romejs-app/app/componentParser/addComponentBoilerPlateReactRouter.js").toString();
+    boilerPlateSrc = fs.readFileSync(path.resolve(__dirname, './addComponentBoilerPlateReactRouter.js').toString());
   } else {
-    boilerPlateSrc = fs.readFileSync("/Users/joelguizar/Desktop/romejs-app/app/componentParser/addComponentBoilerPlate.js").toString();
+    boilerPlateSrc = fs.readFileSync(path.resolve(__dirname, './addComponentBoilerPlateReact.js').toString());
   }
 
-  fs.writeFileSync(__dirname + "/" + childComponentName + ".js", boilerPlateSrc)
   // fs.createReadStream(__dirname + "/" + boilerPlateSrc).pipe(fs.createWriteStream(__dirname+ childComponentName + ".js"));
 
-  let childFilePath = __dirname + "/" + childComponentName + ".js";
+  let parentDir = filePathObj[parentComponentName].split('/');
+  parentDir.pop();
+  parentDir = parentDir.join('/');
+  fs.writeFileSync(parentDir + "/" + childComponentName + ".js", boilerPlateSrc)
+
+  let childFilePath = parentDir + "/" + childComponentName + ".js";
   let childSrc = fs.readFileSync(childFilePath);
   childSrc = childSrc.toString();
 
@@ -125,15 +132,13 @@ addComponentFunction.writeChildComponent = function(childComponentName, parentCo
     }
     if (romerome.body[k].declaration) {
       if (romerome.body[k].declaration.name === "ROME"){
-        romerome.body[k].declaration.name = "default " + childComponentName + ";";
+        romerome.body[k].declaration.name = childComponentName + ";";
       }
     }
   }
 
-  console.log(JSON.stringify(romerome, null, 2));
-
   // let yo = eau.replaceCodeRange(eau.parse(childSrc),[ranges['comp'][0], ranges['comp'][1] + add], compCode2inject)
-  fs.writeFileSync(__dirname + "/" + childComponentName + ".js", escodegen.generate(romerome))
+  fs.writeFileSync(parentDir + "/" + childComponentName + ".js", escodegen.generate(romerome))
 
   // let yo1 = fs.readFileSync(__dirname + "/" + childComponentName + ".js").toString();
 
@@ -142,7 +147,7 @@ addComponentFunction.writeChildComponent = function(childComponentName, parentCo
 
 
   let parentFilePath = filePathObj[parentComponentName]
-
+  console.log('PARENT FILE PATH\n', parentFilePath)
   if(!fs.existsSync(parentFilePath)) {
     parentFilePath += '.js';
     if(!fs.existsSync(parentFilePath)) {
@@ -156,7 +161,7 @@ addComponentFunction.writeChildComponent = function(childComponentName, parentCo
   addComponentFunction.addComponentToMother(parentFilePath, childComponentName, childFilePath)
 
 
-  return;
+  next();
 }
 
 module.exports = addComponentFunction;

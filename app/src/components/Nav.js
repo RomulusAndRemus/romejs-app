@@ -3,6 +3,14 @@ import { BrowserRouter as Router, Link } from 'react-router-dom';
 
 class Nav extends Component {
 
+  constructor(props) {
+    super(props);
+    this.clickHandler = this.clickHandler.bind(this);
+  }
+
+  clickHandler() {
+    this.props.fileParser(this.props.filename);
+  }
   render() {
     if (this.props.filename) {
       $('#tree').treeview({data: [this.props.fileTree(this.props.filepath)]});
@@ -40,7 +48,7 @@ class Nav extends Component {
               </ul>
             </li>
             <li>
-              <Link to="/blank"><i className="fa fa-fw fa-file"></i> Support</Link>
+              <Link to="/redirect" onClick={this.clickHandler}><i className="fa fa-fw fa-refresh"></i> Refresh</Link>
             </li>
           </ul>
         </div>

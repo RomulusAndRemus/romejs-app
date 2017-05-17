@@ -5,8 +5,8 @@ import Nav from './Nav';
 import Home from './Home';
 import Graph from './Graph';
 import Editor from './Editor';
-import Dashboard from './Dashboard';
 import Blank from './Blank';
+import Redirect from './Redirect';
 import componentParser from './../../componentParser/componentParser.js';
 import path from 'path';
 import fs from 'fs';
@@ -16,7 +16,7 @@ if (window.location.pathname.includes('/index.html')) index = window.location.pa
 
 class App extends Component {
 
-  constructor(props){
+  constructor(props) {
     super(props);
     this.state = {
       filename: null,
@@ -28,11 +28,9 @@ class App extends Component {
   }
 
   openFile(callback) {
-    let componentData;
-    let filename;
     remote.dialog.showOpenDialog({ properties: [ 'openFile'], filters: [{ name: 'JavaScript', extensions: ['js', 'jsx'] }]}, (file) => {
-      componentData = componentParser.ASTParser(file[0]);
-      filename = file[0];
+      this.fileParser(file[0]);
+      let filename = file[0];
       let filepath = filename.split('/');
       filepath.pop();
       filepath = filepath.join('/');
@@ -40,9 +38,14 @@ class App extends Component {
         filename: filename,
         filepath: filepath
       })
-      fs.writeFileSync('app/js/graph.js', 'const data = ' + JSON.stringify(componentData, null, 2));
       callback();
     });
+  }
+
+  fileParser(file) {
+    let componentData;
+    componentData = componentParser.ASTParser(file);
+    fs.writeFileSync('app/js/graph.js', 'const data = ' + JSON.stringify(componentData, null, 2))
   }
 
   fileTree(filename) {
@@ -67,7 +70,7 @@ class App extends Component {
       <Router>
         <div id="wrapper">
           <Route render={(props) => (
-            <Nav {...props} fileTree={this.fileTree} filename={this.state.filename} filepath={this.state.filepath} selectedFile={this.selectedFile}/>
+            <Nav {...props} fileTree={this.fileTree} filename={this.state.filename} filepath={this.state.filepath} selectedFile={this.selectedFile} fileParser={this.fileParser} />
           )}/>
           <Route exact path={index} render={(props) => (
             <Home {...props} openFile={this.openFile} />
@@ -79,9 +82,11 @@ class App extends Component {
           <Route path="/editor" render={(props) => (
             <Editor {...props} index={index} filename={this.state.filename} />
           )}/>
-          <Route path="/dashboard" component={Dashboard}/>
           <Route path="/blank" render={(props) => (
-            <Blank {...props} index={index} filename={this.state.filename} />
+            <Blank {...props} />
+          )}/>
+          <Route path="/redirect" render={(props) => (
+            <Redirect {...props} />
           )}/>
         </div>
       </Router>

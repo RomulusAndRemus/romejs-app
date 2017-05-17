@@ -6,7 +6,7 @@ import path from 'path';
 import fs from 'fs';
 
 class Home extends Component {
-  constructor(props){
+  constructor(props) {
     super(props);
   }
   render() {
@@ -44,7 +44,6 @@ class Home extends Component {
                             setTimeout(function() {
                               $this.button('reset');
                               props.history.push('/graph');
-                              console.log(props)
                           }, 1000);
                         })()
 
