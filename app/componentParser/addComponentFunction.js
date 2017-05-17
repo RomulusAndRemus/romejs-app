@@ -125,7 +125,7 @@ addComponentFunction.writeChildComponent = function(childComponentName, parentCo
     }
     if (romerome.body[k].declaration) {
       if (romerome.body[k].declaration.name === "ROME"){
-        romerome.body[k].declaration.name = "default " + childComponentName ";";
+        romerome.body[k].declaration.name = "default " + childComponentName + ";";
       }
     }
   }
