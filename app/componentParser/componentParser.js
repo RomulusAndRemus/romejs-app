@@ -78,7 +78,7 @@
           let routePath;
           component.attributes.forEach(comp => {
             if (comp.name.name === 'path' && comp.value.value) routePath = comp.value.value;
-            if (comp.name.name === 'component') {        
+            if (comp.name.name === 'component' && !reactComponents.includes(comp.value.expression.name)) {        
               reactComponents.push(comp.value.expression.name);
               if (routePath) paths[comp.value.expression.name] = routePath;
             }

@@ -66,7 +66,7 @@ addRouteFunction.grabLinkRange = (src) => {
 }
 
 
-addRouteFunction.addRouteAndLink = function (nodeClicked, nameOfRoute, exactPath, componentToRender, filePathObj, entry) {
+addRouteFunction.addRouteAndLink = function (nodeClicked, nameOfRoute, exactPath, componentToRender, filePathObj, entry, next) {
 
   nameOfRoute = nameOfRoute.split('');
 
@@ -103,11 +103,17 @@ addRouteFunction.addRouteAndLink = function (nodeClicked, nameOfRoute, exactPath
   //   } else {
   //     let routeCodeToInject = '<Route path= ' + nameOfRoute + ' component={' + componentToRender + '}/>'
   //   }
-  let routeCodeToInject = '\n\t<Route exact path= \'' + nameOfRoute + '\' component={' + componentToRender + '}/>\n';
 
-  fs.writeFileSync(entry, eau.replaceCodeRange(entryTree, routeRange, routeCodeToInject));
-  fs.writeFileSync(filePathObj[nodeClicked], eau.replaceCodeRange(linkTree, linkRange, linkCodeToInject));
-  return;
+  let routeCodeToInject;
+
+  if (exactPath === 'on') {
+    routeCodeToInject = '\n\t<Route exact path= \'' + nameOfRoute + '\' component={' + componentToRender + '}/>\n';
+  } else {
+    routeCodeToInject = '\n\t<Route path= \'' + nameOfRoute + '\' component={' + componentToRender + '}/>\n';
+  }
+  if (!entrySrc.includes(routeCodeToInject)) fs.writeFileSync(entry, eau.replaceCodeRange(entryTree, routeRange, routeCodeToInject));
+  if (!linkSrc.includes(linkCodeToInject)) fs.writeFileSync(filePathObj[nodeClicked], eau.replaceCodeRange(linkTree, linkRange, linkCodeToInject));
+  next();
 }
 
 module.exports = addRouteFunction;

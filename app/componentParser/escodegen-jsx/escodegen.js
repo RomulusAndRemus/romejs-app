@@ -1195,8 +1195,8 @@
 
       // export default HoistableDeclaration[Default]
       // export default AssignmentExpression[In] ;
+      result = join(result, 'default');
       if (stmt['default']) {
-        result = join(result, 'default');
         if (isStatement(stmt.declaration)) {
           result = join(result, this.generateStatement(stmt.declaration, bodyFlags));
         } else {
