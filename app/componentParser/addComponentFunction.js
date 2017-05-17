@@ -1,9 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 const eau = require('./esprima-ast-utils/index.js');
+const escodegen = require('./escodegen-jsx/escodegen.js')
 
+const addComponentFunction = {};
 
-let childRoute = null;
 
 addComponentFunction.findComponentRange = function(src){
 
@@ -22,7 +23,7 @@ addComponentFunction.findComponentRange = function(src){
 
 
 addComponentFunction.addComponentToMother = function (src, componentName, childFilepath){
-  let src = fs.readFileSync(src);
+  src = fs.readFileSync(src);
   src = src.toString();
   let parentTree = eau.parse(src);
   let JSXCodeToInject = "<" + componentName + " />"
@@ -53,12 +54,13 @@ addComponentFunction.grabChildComponentRanges = function(entry){
   let entrySrc = fs.readFileSync(entry);
   entrySrc = entrySrc.toString();
 
+  let src;
 
   if (addComponentFunction.isReactRouterV4installed(entrySrc)){
-    let src = fs.readFileSync("./addComponentBoilerPlateReactRouter.js");
+    src = fs.readFileSync("/Users/joelguizar/Desktop/romejs-app/app/componentParser/addComponentBoilerPlateReactRouter.js");
     src = src.toString();
   } else {
-    let src = fs.readFileSync("./addComponentBoilerPlate.js");
+    src = fs.readFileSync("/Users/joelguizar/Desktop/romejs-app/app/componentParser/addComponentBoilerPlate.js");
     src = src.toString();
   }
 
@@ -67,38 +69,94 @@ addComponentFunction.grabChildComponentRanges = function(entry){
 
 
   for (let i = 0; i < src.length; i++){
+    if (src[i] === "c" && src[i+1] === "l" && src[i+2] === "a" && src[i+3] === "s" && src[i+4] === "s"){
+      ranges["comp"] = [i, i+27];
+    } else if (src[i] === "e" && src[i+1] === "x" && src[i+2] === "p" && src[i+3] === "o"){
+      ranges["export"] = [i, i+21];
+    }
   }
 
-  return ranges
+  return ranges;
 }
 
 
-addComponentFunction.writeChildComponent = function(boilerPlateSrc, childComponentName, parentComponentName){
+addComponentFunction.writeChildComponent = function(childComponentName, parentComponentName, filePathObj){
   //write boiler plate in different file,  stringify it, then writeFileSync
-  let boilerPlateSrc = fs.readFileSync(boilerPlateSrc);
-  boilerPlateSrc = boilerPlateSrc.toString();
-  let counter = 0;
 
-  fs.createReadStream(__dirname + "/" + boilerPlateSrc).pipe(fs.createWriteStream(__dirname+'romanChild' + counter + ".js"));
 
-  let childFilePath = __dirname + '/romanChild' + counter + ".js";
+  let boilerPlateSrc;
+
+  if (addComponentFunction.isReactRouterV4installed){
+    boilerPlateSrc = fs.readFileSync("/Users/joelguizar/Desktop/romejs-app/app/componentParser/addComponentBoilerPlateReactRouter.js").toString();
+  } else {
+    boilerPlateSrc = fs.readFileSync("/Users/joelguizar/Desktop/romejs-app/app/componentParser/addComponentBoilerPlate.js").toString();
+  }
+
+  fs.writeFileSync(__dirname + "/" + childComponentName + ".js", boilerPlateSrc)
+  // fs.createReadStream(__dirname + "/" + boilerPlateSrc).pipe(fs.createWriteStream(__dirname+ childComponentName + ".js"));
+
+  let childFilePath = __dirname + "/" + childComponentName + ".js";
   let childSrc = fs.readFileSync(childFilePath);
-  childSrc.toString();
+  childSrc = childSrc.toString();
 
-  let ranges = addComponentFunction.grabChildComponentRanges(chlidSrc);
-
-  let compCode2inject = "class " + childComponentName + " extends Component"
-  let exportCode2inject = "export default " + childComponentName
+  let ranges = addComponentFunction.grabChildComponentRanges(childFilePath);
 
 
-  eau.replaceCodeRange(childSrc,ranges['comp'], compCode2inject)
-  eau.replaceCodeRange(childSrc,ranges['export'], exportCode2inject)
 
-  /*need to grab parent SRC file!!!*/
+  // let compCode2inject = "class " + childComponentName + " extends Component {"
+  // let exportCode2inject = "export default " + childComponentName + " ;"
 
-  addComponentFunction.addComponentToMother(parentSrc, childComponentName, childFilePath)
 
-  //push childComponentName: childFilePath into masterObject
+  let romerome = eau.parse(childSrc);
+
+
+  for (let j = 0; j < romerome.tokens.length; j++)
+    if (romerome.tokens[j].value === "ROME"){
+      romerome.tokens[j].value = childComponentName
+      // console.log(childComponentName);
+      // console.log("THIS IS IT!!!", romerome.tokens[j].value)
+    }
+
+  for (let k = 0; k < romerome.body.length; k++) {
+    if (romerome.body[k].id) {
+      if (romerome.body[k].id.name === "ROME"){
+        romerome.body[k].id.name = childComponentName;
+      }
+    }
+    if (romerome.body[k].declaration) {
+      if (romerome.body[k].declaration.name === "ROME"){
+        romerome.body[k].declaration.name = "default " + childComponentName + ";";
+      }
+    }
+  }
+
+  console.log(JSON.stringify(romerome, null, 2));
+
+  // let yo = eau.replaceCodeRange(eau.parse(childSrc),[ranges['comp'][0], ranges['comp'][1] + add], compCode2inject)
+  fs.writeFileSync(__dirname + "/" + childComponentName + ".js", escodegen.generate(romerome))
+
+  // let yo1 = fs.readFileSync(__dirname + "/" + childComponentName + ".js").toString();
+
+  // let yoo = eau.replaceCodeRange(eau.parse(yo1),[ranges['export'][0] + add, ranges['export'][1] + add], exportCode2inject)
+  // fs.writeFileSync(__dirname + "/" + childComponentName + ".js", yoo)
+
+
+  let parentFilePath = filePathObj[parentComponentName]
+
+  if(!fs.existsSync(parentFilePath)) {
+    parentFilePath += '.js';
+    if(!fs.existsSync(parentFilePath)) {
+    parentFilePath += 'x';
+    }
+  }
+
+  parentSrc = fs.readFileSync(parentFilePath);
+  parentSrc = parentSrc.toString();
+
+  addComponentFunction.addComponentToMother(parentFilePath, childComponentName, childFilePath)
+
+
+  return;
 }
 
 module.exports = addComponentFunction;

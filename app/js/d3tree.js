@@ -316,36 +316,71 @@ d3.select("body").on('contextmenu', function (d, i) {
       } else {
         originY = originY - 65 +'px';
       }
-      
+
       d3.event.preventDefault();
       contextMenuShowing = true;
       d = d3_target.datum();
       // Build the popup
       canvas = d3.select(".canvas");
       mousePosition = d3.mouse(canvas.node());
-      
+
       popup = canvas.append("div")
       .attr("id", "popup")
       .style("left", originX)
       .style("top", originY);
+
+
       $("#popup").append(
-        `<div class="card-header">
-          <h6>` + d3_target.text() + `</h6>
-        </div>
-        <form>
-          <div class="form-group">
-            <label>Route path=</label>
-            <input type="route-path" class="form-control" id="route-path" placeholder="e.g /Home">
+        `
+          <div class="card-header">
+            <h6 id="CompoTitle">` + d3_target.text() + `<button class="btn btn-primary btn-xs" id="gobacktomenu"> R </button> </h6>
           </div>
-          <div class="form-group">
-            <label>Select a component</label>
-            <select class="form-control" id="component-list"></select>
+          <div class="choiceForm">
+            <button id="chooseComponent"> Add Component </button>
+            <button id="chooseRoute"> Add Route </button>
           </div>
-          <div class="form-check">
-            <label class="form-check-label">
-            <input type="checkbox" class="form-check-input" id="exact">  exact path?</label>
-            <button type="submit" class="btn btn-primary btn-xs">Submit</button>
-          </div>`);
+
+            <div class="addComponentForm hidden">
+              <label id="name-your-compo"> Name Your Component </label>
+              <input type="text" id="component-name-input" placeholder= "e.g Rome">
+              <button type="submit" class="btn btn-primary btn-xs" id="submitCompo">Submit</button>
+            </div>
+
+            <div class="addRouteForm hidden">
+              <form>
+                <div class="form-group">
+                    <label>Route path=</label>
+                    <input type="route-path" class="form-control" id="route-path" placeholder="e.g /Home">
+                  </div>
+                  <div class="form-group">
+                    <label>Select a Component to Render</label>
+                    <select class="form-control" id="component-list"></select>
+                  </div>
+                  <div class="form-check">
+                    <label class="form-check-label">
+                    <input type="checkbox" class="form-check-input" id="exact">  exact path?</label>
+                    <button type="submit" class="btn btn-primary btn-xs" id="submitRoute">Submit</button>
+                  </div>
+              </form>
+            </div>
+          `);
+
+      $("#chooseComponent").on("click", function(e){
+        $(".addComponentForm").removeClass("hidden")
+        $(".choiceForm").addClass("hidden")
+      })
+
+      $("#chooseRoute").on("click", function(e){
+        $(".addRouteForm").removeClass("hidden")
+        $(".choiceForm").addClass("hidden")
+      })
+
+      $('#gobacktomenu').on("click", function(e){
+        $(".choiceForm").removeClass("hidden")
+        $(".addComponentForm").addClass("hidden")
+        $(".addRouteForm").addClass("hidden")
+      })
+
 
       let components = Object.keys(data[1]);
       let options = '';
@@ -355,13 +390,14 @@ d3.select("body").on('contextmenu', function (d, i) {
 
       $('#component-list').append(options);
 
-      $("button").click(e => {
+
+      $("#submitRoute").click(e => {
         e.preventDefault();
         if ($("#route-path").val()) {
           $.post("/addroute", {
             node: d3_target.text(),
             route: $('#route-path').val(),
-            exact: $('#id').val(),
+            exact: $('#exact').val(),
             componentToRender: $('#component-list').val(),
             filePathObj: data[1],
             entry: data[2]
@@ -370,7 +406,21 @@ d3.select("body").on('contextmenu', function (d, i) {
             contextMenuShowing = false;
           });
           $("#route-path").val("");
-        }  
+        }
+      })
+
+      $("#submitCompo").click(e => {
+        e.preventDefault();
+        if ($("#component-name-input").val()) {
+          $.post("/addCompo", {
+            node: d3_target.text(),
+            componentName: $('#component-name-input').val(),
+            filePathObj: data[1],
+          }).then(()=> {
+            d3.select("#popup").remove();
+            contextMenuShowing = false;
+          });
+        }
       })
     }
   }

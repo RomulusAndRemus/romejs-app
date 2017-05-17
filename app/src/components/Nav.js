@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import { BrowserRouter as Router, Link } from 'react-router-dom';
 
 class Nav extends Component {
-    
+
   render() {
     if (this.props.filename) {
       $('#tree').treeview({data: [this.props.fileTree(this.props.filepath)]});

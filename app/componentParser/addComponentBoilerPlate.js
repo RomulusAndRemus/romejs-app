@@ -1,4 +1,3 @@
-import INSERT from "FILEPATH";
 import React, {Component} from 'react';
 
 class ROME extends Component {
