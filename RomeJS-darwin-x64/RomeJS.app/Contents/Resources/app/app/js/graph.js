@@ -15,7 +15,12 @@ const data = [
                 "name": "Rawr"
               },
               {
-                "name": "Sparta"
+                "name": "Sparta",
+                "children": [
+                  {
+                    "name": "cheesecake"
+                  }
+                ]
               }
             ]
           }
@@ -25,6 +30,9 @@ const data = [
         "name": "Compo2",
         "children": [
           {
+            "name": "Whiskey"
+          },
+          {
             "name": "Rome"
           }
         ]
@@ -33,7 +41,12 @@ const data = [
         "name": "Comp3",
         "children": [
           {
-            "name": "Comp4"
+            "name": "Comp4",
+            "children": [
+              {
+                "name": "cheesecake"
+              }
+            ]
           }
         ]
       },
@@ -69,7 +82,9 @@ const data = [
     "Reloaded": "/Users/Michael/Desktop/rome-js/reactapp2/src/Components/Reloaded.js",
     "Rawr": "/Users/Michael/Desktop/rome-js/reactapp2/src/Components/Rawr.js",
     "Sparta": "/Users/Michael/Desktop/rome-js/reactapp2/src/Components/Sparta.js",
+    "cheesecake": "/Users/Michael/Desktop/rome-js/reactapp2/src/folder1/folder2/cheesecake.js",
     "Compo2": "/Users/Michael/Desktop/rome-js/reactapp2/src/Compo2",
+    "Whiskey": "/Users/Michael/Desktop/rome-js/reactapp2/src/Whiskey.js",
     "Rome": "/Users/Michael/Desktop/rome-js/reactapp2/src/Rome.js",
     "Comp3": "/Users/Michael/Desktop/rome-js/reactapp2/src/folder1/folder2/Comp3",
     "Comp4": "/Users/Michael/Desktop/rome-js/reactapp2/src/folder1/folder2/Comp4.js",
@@ -101,6 +116,9 @@ const data = [
     ],
     "Comp3": [
       "Quack"
+    ],
+    "cheesecake": [
+      "Sparta"
     ],
     "Meow": [
       "Container"
