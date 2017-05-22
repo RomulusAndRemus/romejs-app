@@ -8,13 +8,19 @@ class Nav extends Component {
     this.clickHandler = this.clickHandler.bind(this);
   }
 
+  componentWillReceiveProps() {
+    if (this.props.filename) {
+      $('#tree').treeview({data: [this.props.fileTree(this.props.filepath)]});
+    }
+  }
+
   clickHandler() {
     this.props.fileParser(this.props.filename);
   }
   render() {
-    if (this.props.filename) {
-      $('#tree').treeview({data: [this.props.fileTree(this.props.filepath)]});
+    
       let props = this.props;
+      console.log('listener added');
       $('.node-tree').on('click', function(e) {
         e.preventDefault();
         if ($(this)[0].innerText.includes('.')) {
@@ -22,7 +28,7 @@ class Nav extends Component {
           props.selectedFile($(this)[0].innerText);
         }
       });
-    }
+
     return (
       <nav className="navbar navbar-inverse navbar-fixed-top" role="navigation">
         <div className="navbar-header">

@@ -11,6 +11,7 @@
   "license": "MIT",
   "devDependencies": {
     "body-parser": "^1.17.1",
+    "mousetrap": "^1.6.1",
     "nodemon": "^1.11.0"
   }
 }

@@ -3,6 +3,12 @@ import { ipcRenderer } from 'electron';
 import path from 'path';
 
 class Graph extends Component {
+  componentDidMount() {
+    let self = this;
+    ipcRenderer.on('redirect', function() {
+      self.props.history.push('/redirect');
+    })
+  }
   render() {
     return (
       <div className="page-wrapper">

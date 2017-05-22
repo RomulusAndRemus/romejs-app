@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
+import { ipcRenderer } from 'electron';
 import { BrowserRouter as Router, NavLink } from 'react-router-dom';
+import path from 'path';
+import fs from 'fs';
 
 class Editor extends Component {
   constructor(props) {
@@ -8,8 +11,6 @@ class Editor extends Component {
 
   editor(filename) {
     let amdRequire = global.require('monaco-editor/min/vs/loader.js').require;
-    let path = require('path');
-    let fs = require('fs');
     let cwd = this.props.index;
     cwd = cwd.split('/');
     cwd.pop();
@@ -30,9 +31,8 @@ class Editor extends Component {
     self.module = undefined;
     // workaround monaco-typescript not understanding the environment
     self.process.browser = true;
-    let editor;
     amdRequire(['vs/editor/editor.main'], () => {
-      editor = monaco.editor.create(document.getElementById('container'), {
+      window.editor = monaco.editor.create(document.getElementById('container'), {
         value: fs.readFileSync(filename, { encoding: 'utf8' }),
         language: 'javascript',
         theme: "vs-dark",
@@ -40,8 +40,18 @@ class Editor extends Component {
     });
   }
 
+  save(filename) {
+    console.log('SAVE FUNCTION', filename);
+    let value = window.editor.getValue();
+    // fs.writeFileSync(filename, value);
+  }
   componentDidMount() {
+    let self = this;
     this.editor(this.props.filename);
+    ipcRenderer.on('save', () => {
+      self.save(self.props.filename);
+      self.props.history.push('/blank');
+    });
   }
   render() {
     return (

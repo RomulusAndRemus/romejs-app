@@ -1,6 +1,7 @@
 const electron = require('electron');
-const { BrowserWindow, app, dialog, globalShortcut } = require('electron');
+const { BrowserWindow, app, dialog, globalShortcut, ipcMain } = require('electron');
 const Menu = electron.Menu;
+const electronLocalshortcut = require('electron-localshortcut');
 const fs = require('fs');
 const path = require('path');
 const url = require('url');
@@ -97,7 +98,7 @@ function createWindow () {
   const menu = Menu.buildFromTemplate(template)
   Menu.setApplicationMenu(menu)
     // Create the browser window.
-    mainWindow = new BrowserWindow({width: 1440, height: 900, title: 'RomeJS', icon: __dirname + './app/images/romejs.icns'})
+    mainWindow = new BrowserWindow({width: 1440, height: 900, title: 'RomeJS', icon: __dirname + './app/images/romejs.icns', titleBarStyle: 'hidden'})
 
     // and load the index.html of the app.
     mainWindow.loadURL(url.format({
@@ -122,7 +123,16 @@ function createWindow () {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow)
+app.on('ready', () => {
+  createWindow();
+  electronLocalshortcut.register(mainWindow, 'CommandOrControl+S', () => {
+    mainWindow.webContents.send('save');
+  });
+  ipcMain.on('reload', function () {
+    mainWindow.webContents.send('redirect', function() {
+    });
+  });
+})
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {

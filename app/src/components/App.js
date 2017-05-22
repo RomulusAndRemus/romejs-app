@@ -14,6 +14,7 @@ import fs from 'fs';
 
 let index;
 if (window.location.pathname.includes('/index.html')) index = window.location.pathname;
+index = decodeURI(index);
 let cwd = index;
 cwd = cwd.split('/');
 cwd.pop();
@@ -33,6 +34,7 @@ class App extends Component {
     this.fileParser = this.fileParser.bind(this);
   }
   componentWillMount() {
+    console.log('COMPONENT WILL MOUNT')
     server.startServer(cwd);
   }
   openFile(callback) {
@@ -55,7 +57,7 @@ class App extends Component {
   fileParser(file) {
     let componentData;
     componentData = componentParser.ASTParser(file);
-    fs.writeFileSync(cwd + '/js/graph.js', 'const data = ' + JSON.stringify(componentData, null, 2))
+    $.post('http://localhost:3333/graphdata', { componentData: componentData});
   }
 
   fileTree(filename) {
@@ -88,7 +90,9 @@ class App extends Component {
           <Route path="/home" render={(props) => (
             <Home {...props} openFile={this.openFile} />
           )}/>
-          <Route path="/graph" component={Graph}/>
+          <Route path="/graph" render={(props) => (
+            <Graph {...props} />
+          )}/>
           <Route path="/editor" render={(props) => (
             <Editor {...props} index={index} filename={this.state.filename} />
           )}/>

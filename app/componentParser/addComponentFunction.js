@@ -84,7 +84,7 @@ addComponentFunction.grabChildComponentRanges = function(entry, cwd){
 }
 
 
-addComponentFunction.writeChildComponent = function(childComponentName, parentComponentName, filePathObj, cwd, next){
+addComponentFunction.writeChildComponent = function(childComponentName, parentComponentName, filePathObj, cwd, entry, next){
   //write boiler plate in different file,  stringify it, then writeFileSync
 
   let boilerPlateSrc;
@@ -97,9 +97,16 @@ addComponentFunction.writeChildComponent = function(childComponentName, parentCo
 
   // fs.createReadStream(__dirname + "/" + boilerPlateSrc).pipe(fs.createWriteStream(__dirname+ childComponentName + ".js"));
 
-  let parentDir = filePathObj[parentComponentName].split('/');
-  parentDir.pop();
-  parentDir = parentDir.join('/');
+  let parentDir;
+    if (filePathObj[parentComponentName]) {
+      parentDir = filePathObj[parentComponentName].split('/');
+      parentDir.pop();
+      parentDir = parentDir.join('/');
+    } else {
+      parentDir = entry.split('/');
+      parentDir.pop();
+      parentDir = parentDir.join('/');
+    }
   fs.writeFileSync(parentDir + "/" + childComponentName + ".js", boilerPlateSrc)
 
   let childFilePath = parentDir + "/" + childComponentName + ".js";
@@ -146,8 +153,12 @@ addComponentFunction.writeChildComponent = function(childComponentName, parentCo
   // fs.writeFileSync(__dirname + "/" + childComponentName + ".js", yoo)
 
 
-  let parentFilePath = filePathObj[parentComponentName]
-  console.log('PARENT FILE PATH\n', parentFilePath)
+  let parentFilePath
+  if (filePathObj[parentComponentName]) {
+    parentFilePath = filePathObj[parentComponentName];
+  } else {
+    parentFilePath = entry;
+  }
   if(!fs.existsSync(parentFilePath)) {
     parentFilePath += '.js';
     if(!fs.existsSync(parentFilePath)) {
