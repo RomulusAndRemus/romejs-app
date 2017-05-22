@@ -5,9 +5,8 @@
   const path = require('path');
 
   function ASTParser(file) {
-
     //This array contains the data for the component tree and the filepaths for each component
-    const outputData = [];
+    const outputData = {};
 
     //Grabs the import variables and stores the variable name as the key and the path as the value
     const filepaths = {};
@@ -33,12 +32,10 @@
       //Reads file and converts the code into string format
       let src = fs.readFileSync(entry);
       src = src.toString();
-
       //Takes the current file path and extracts its working directory
       let file = entry.split('/');
       let filename = file.pop();
       file = file.join('/');
-      
       //Strips the extension from the filename
       if (filename[filename.length + 1] === 'x') filename = filename.slice(0, -4);
       else filename = filename.slice(0, -3);
@@ -139,12 +136,12 @@
       return inner;
     }
     //Main object that stores the components and its children
-    outputData.push(mainObj);
+    outputData.components = mainObj;
     //Object that stores filepaths for components
-    outputData.push(filepaths);
+    outputData.filepaths = filepaths;
     //Name of the entry file
-    outputData.push(file);
-    outputData.push(linkedComponents);
+    outputData.entry = file;
+    outputData.linkedComponents = linkedComponents;
     return outputData;
   }
   exports.ASTParser = ASTParser;

@@ -2,13 +2,14 @@ let masterData ={};
 
 //replace with the data you get from Steve
 let routeLinks = {};
+let links = [];
 
 if (data) {
-  masterData = data[0];
-  routeLinks = data[3];
+  masterData = data.components;
+  routeLinks = data.linkedComponents;
+  links = Object.keys(routeLinks);
 }
 
-const links = Object.keys(routeLinks);
 
 //coordinates holds where the lasers should go
 
@@ -334,7 +335,7 @@ d3.select("body").on('contextmenu', function (d, i) {
       })
 
 
-      let components = Object.keys(data[1]);
+      let components = Object.keys(data.filepaths);
       let options = '';
       components.forEach(comp => {
         options += '<option>' + comp + '</option>';
@@ -350,8 +351,8 @@ d3.select("body").on('contextmenu', function (d, i) {
             route: $('#route-path').val(),
             exact: $('#exact').val(),
             componentToRender: $('#component-list').val(),
-            filePathObj: data[1],
-            entry: data[2]
+            filePathObj: data.filepaths,
+            entry: data.entry
           }).then(()=> {
             d3.select("#popup").remove();
             contextMenuShowing = false;
@@ -366,7 +367,8 @@ d3.select("body").on('contextmenu', function (d, i) {
           $.post("/addCompo", {
             node: d3_target.text(),
             componentName: $('#component-name-input').val(),
-            filePathObj: data[1],
+            filePathObj: data.filepaths,
+            entry: data.entry
           }).then(()=> {
             d3.select("#popup").remove();
             contextMenuShowing = false;

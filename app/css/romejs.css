@@ -59,6 +59,7 @@ body {
 @media(min-width:768px) {
     #wrapper {
         padding-left: 225px;
+        padding-top: 15px;
     }
 
     #page-wrapper {
@@ -151,6 +152,7 @@ ul.alert-dropdown {
         overflow-x: hidden;
         padding-bottom: 40px;
         border-right: solid #333;
+        margin-top: 15px;
     }
 
     .side-nav>li>a {

@@ -3,7 +3,7 @@ import { BrowserRouter as Router, NavLink } from 'react-router-dom';
 
 class Redirect extends Component {
   componentDidMount() {
-    setTimeout(() => {this.props.history.push('/graph')}, 50);
+    setTimeout(() => {this.props.history.push('/graph')}, 500);
   }
   render() {
     return (

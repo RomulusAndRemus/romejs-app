@@ -21,13 +21,13 @@ class Home extends Component {
                   <div className="row">
                       <div className="col-lg-12">
                           <h1 className="page-header" style={{color: "#ccc"}}>
-                              React Router Visualizer
+                              A Visualized IDE for Your React Application.
                           </h1>
                       </div>
                   </div>
                   <div className="jumbotron">
-                      <h1>Welcome to RomeJS</h1>
-                      <p>Let's get started! Please select the entry point of your React application. This is file that contains your Router opening element.</p>
+                      <h1>Welcome to RomeJS.</h1>
+                      <p>Let's get started! Please select the entry point of your React application. This is the file which renders your root component (e.g. "App.js"; "Index.js"). </p>
                       <p><a id="open-file" className="btn btn-primary btn-lg" role="button" data-loading-text="<i class='fa fa-spinner fa-spin '></i> Processing File" onClick={e => {
                         e.preventDefault();
                         let self = this;
