@@ -1,8 +1,5 @@
 # RomeJS App
 
-## Summary
-Show your skills! Here are some skills that all Codesmith graduates should have before moving on. There are 5 parts, each in their own directory. Follow the directions in this README for instructions on each part.
-
 ## Get Started
 
 ````
