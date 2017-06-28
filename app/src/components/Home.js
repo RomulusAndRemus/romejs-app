@@ -2,13 +2,9 @@ import React, { Component } from 'react';
 import { BrowserRouter as Router, NavLink, Redirect} from 'react-router-dom';
 import { dialog, remote } from  'electron';
 import componentParser from './../../componentParser/componentParser.js';
-import path from 'path';
-import fs from 'fs';
 
 class Home extends Component {
-  constructor(props) {
-    super(props);
-  }
+  
   render() {
     return (
       <div className="page-wrapper" className="home-page">

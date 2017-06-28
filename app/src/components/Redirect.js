@@ -2,8 +2,9 @@ import React, {Component} from 'react';
 import { BrowserRouter as Router, NavLink } from 'react-router-dom';
 
 class Redirect extends Component {
+  
   componentDidMount() {
-    setTimeout(() => {this.props.history.push('/graph')}, 500);
+    setTimeout(() => {this.props.history.push('/graph')}, 400);
   }
   render() {
     return (

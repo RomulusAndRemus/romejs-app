@@ -34,7 +34,6 @@ class App extends Component {
     this.fileParser = this.fileParser.bind(this);
   }
   componentWillMount() {
-    console.log('COMPONENT WILL MOUNT')
     server.startServer(cwd);
   }
   openFile(callback) {

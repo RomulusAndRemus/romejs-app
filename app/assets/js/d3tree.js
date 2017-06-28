@@ -6,8 +6,10 @@ let links = [];
 
 if (data) {
   masterData = data.components;
-  routeLinks = data.linkedComponents;
-  links = Object.keys(routeLinks);
+  if (data.linkedComponents) {
+    routeLinks = data.linkedComponents;
+    links = Object.keys(routeLinks);
+  }
 }
 
 

@@ -1,7 +1,6 @@
 const electron = require('electron');
 const { BrowserWindow, app, dialog, globalShortcut, ipcMain } = require('electron');
 const Menu = electron.Menu;
-const electronLocalshortcut = require('electron-localshortcut');
 const fs = require('fs');
 const path = require('path');
 const url = require('url');
@@ -125,9 +124,6 @@ function createWindow () {
 // Some APIs can only be used after this event occurs.
 app.on('ready', () => {
   createWindow();
-  electronLocalshortcut.register(mainWindow, 'CommandOrControl+S', () => {
-    mainWindow.webContents.send('save');
-  });
   ipcMain.on('reload', function () {
     mainWindow.webContents.send('redirect', function() {
     });

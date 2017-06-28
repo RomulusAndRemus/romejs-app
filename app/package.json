@@ -2,7 +2,7 @@
   "name": "romejs-tree",
   "version": "1.0.0",
   "description": "",
-  "main": "./js/d3tree.js",
+  "main": "./assets/js/d3tree.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon server.js"

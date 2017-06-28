@@ -5,9 +5,6 @@ import path from 'path';
 import fs from 'fs';
 
 class Editor extends Component {
-  constructor(props) {
-    super(props);
-  }
 
   editor(filename) {
     let amdRequire = global.require('monaco-editor/min/vs/loader.js').require;
@@ -41,7 +38,6 @@ class Editor extends Component {
   }
 
   save(filename) {
-    console.log('SAVE FUNCTION', filename);
     let value = window.editor.getValue();
     // fs.writeFileSync(filename, value);
   }

@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import { ipcRenderer } from 'electron';
-import path from 'path';
 
 class Graph extends Component {
+  
   componentDidMount() {
     let self = this;
     ipcRenderer.on('redirect', function() {
